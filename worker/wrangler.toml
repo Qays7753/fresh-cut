@@ -11,8 +11,13 @@ binding       = "DB"
 database_name = "alyaf-alshamal"
 database_id   = "REPLACE_WITH_D1_DATABASE_ID"
 
-# Vars (non-secret). Set via dashboard or wrangler:
-#   wrangler secret put MAILCHANNELS_KEY
+# Secrets (set with `wrangler secret put <NAME>`, never commit them):
+#   RESEND_API_KEY          — lead-notification email (Resend). Optional;
+#                             without it, email degrades to a silent no-op.
+#   PUBLIC_DEPLOY_HOOK_URL   — Cloudflare Pages deploy hook. The worker POSTs
+#                             it after each catalog/settings edit to rebuild
+#                             the public site. Optional.
+#   MAIL_FROM (optional)     — verified Resend "from" address.
 [vars]
 ADMIN_ORIGIN = "https://alyaf-alshamal-admin.pages.dev"
 

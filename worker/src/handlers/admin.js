@@ -14,6 +14,35 @@ import {
 } from '../queries.js';
 
 export async function handleAdmin(request, env, ctx, actor) {
+  const res = await routeAdmin(request, env, ctx, actor);
+
+  // After a successful mutation to catalog/settings, trigger a rebuild of
+  // the public site (Cloudflare Pages deploy hook). Fire-and-forget: a
+  // failed trigger must never turn a successful save into an error.
+  const method = request.method;
+  const path = new URL(request.url).pathname.replace(/^\/api\/admin\//, '');
+  if (method !== 'GET' && res.status >= 200 && res.status < 300 && affectsPublicSite(path)) {
+    ctx?.waitUntil?.(triggerRebuild(env));
+  }
+  return res;
+}
+
+// Routes whose changes are reflected on the public site.
+function affectsPublicSite(path) {
+  return /^(products|variants|cuts|categories|settings)(\/|$)/.test(path);
+}
+
+async function triggerRebuild(env) {
+  const hook = env.PUBLIC_DEPLOY_HOOK_URL;
+  if (!hook) return; // Not configured yet — nothing to do.
+  try {
+    await fetch(hook, { method: 'POST' });
+  } catch (_) {
+    // Best-effort — swallow. The edit is already persisted in D1.
+  }
+}
+
+async function routeAdmin(request, env, ctx, actor) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/^\/api\/admin\//, '');
   const method = request.method;

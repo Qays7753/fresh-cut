@@ -1,43 +1,40 @@
 // worker/src/email.js
-// Fire-and-forget notification email. Per form-submit-order skill:
-// "email notification is fire-and-forget and its failure never
-// blocks the lead or the WhatsApp handoff."
+// Fire-and-forget lead-notification email via Resend.
 //
-// Secrets ( MailChannels / Resend / any provider ) are configurable
-// via wrangler secrets. If absent, we degrade silently: log only.
+// Contract (form-submit-order skill): this is best-effort — its failure
+// never blocks the lead save or the WhatsApp handoff, and it must never
+// throw. If RESEND_API_KEY is not set, we degrade to a silent no-op.
+//
+// Config (set via `wrangler secret put` / [vars]):
+//   RESEND_API_KEY  — required for email to actually send.
+//                     `wrangler secret put RESEND_API_KEY`
+//   MAIL_FROM       — optional "from" address. Must be on a domain you
+//                     have verified in Resend. If unset, we fall back to
+//                     Resend's shared sandbox sender, which only delivers
+//                     to the address that owns the Resend account.
 
-const MAILCHANNELS_ENDPOINT = 'https://api.mailchannels.net/tx/v1/send';
+const RESEND_ENDPOINT = 'https://api.resend.com/emails';
+const DEFAULT_FROM = 'ألياف الشمال <onboarding@resend.dev>';
 
 export async function sendLeadNotification(env, { to, ref, lead }) {
-  // Degrade safely: if no API key or no recipient, never throw.
+  // Degrade safely: no recipient or no API key → never throw, no-op.
   if (!to) return { ok: false, reason: 'no_recipient' };
+  if (!env.RESEND_API_KEY) return { ok: false, reason: 'no_api_key' };
 
   const payload = {
-    personalizations: [{ to: [{ email: to }] }],
-    from: { email: 'no-reply@alyaf-alshamal.pages.dev', name: 'ألياف الشمال' },
+    from: env.MAIL_FROM || DEFAULT_FROM,
+    to: [to],
     subject: `طلب جديد — ${ref}`,
-    content: [{ type: 'text/plain', value: buildBody(ref, lead) }],
+    text: buildBody(ref, lead),
   };
 
   try {
-    if (env.MAILCHANNELS_KEY) {
-      // Authenticated path — secret is set in wrangler.
-      const r = await fetch(MAILCHANNELS_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': env.MAILCHANNELS_KEY,
-        },
-        body: JSON.stringify(payload),
-      });
-      return { ok: r.ok, status: r.status };
-    }
-    // Unauthenticated path: MailChannels allows Cloudflare Workers
-    // to send without an API key from verified origins. If it fails,
-    // we swallow the error — the lead is already saved to D1.
-    const r = await fetch(MAILCHANNELS_ENDPOINT, {
+    const r = await fetch(RESEND_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+      },
       body: JSON.stringify(payload),
     });
     return { ok: r.ok, status: r.status };
