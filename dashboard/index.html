@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>لوحة تحكم — ألياف الشمال</title>
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body class="admin-body" data-bar="true">
+
+  <header class="admin-header">
+    <div class="admin-header__inner">
+      <span class="admin-header__brand">ألياف الشمال — اللوحة</span>
+      <input type="search" class="admin-header__search" placeholder="بحث…" aria-label="بحث عام">
+    </div>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- Today -->
+    <section class="admin-section" data-page="today">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">اليوم</h1>
+      <div data-today>
+        <p class="admin-card">جارٍ التحميل…</p>
+      </div>
+    </section>
+
+    <!-- Leads -->
+    <section class="admin-section" data-page="leads">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الليds</h1>
+      <div data-leads>
+        <p class="admin-card">جارٍ التحميل…</p>
+      </div>
+    </section>
+
+    <!-- Products -->
+    <section class="admin-section" data-page="products">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الأصناف</h1>
+      <div class="products-toolbar" data-selected="false">
+        <input type="search" class="products-toolbar__search" placeholder="بحث بالاسم…" aria-label="بحث الأصناف">
+        <button class="products-toolbar__bulk">تعطيل المحدد</button>
+      </div>
+      <div data-products>
+        <p class="admin-card">جارٍ التحميل…</p>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="admin-section" data-page="settings">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الإعدادات</h1>
+      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
+        كل نص يظهر على الموقع العام يأتي من هنا. التعديل يُطلق إعادة بناء الموقع تلقائياً.
+      </p>
+      <div data-settings>
+        <p class="admin-card">جارٍ التحميل…</p>
+      </div>
+    </section>
+
+    <!-- Restaurants -->
+    <section class="admin-section" data-page="restaurants">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">المطاعم</h1>
+      <div data-restaurants>
+        <p class="admin-card">جارٍ التحميل…</p>
+      </div>
+    </section>
+
+    <!-- Cuts -->
+    <section class="admin-section" data-page="cuts">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">أنواع القص</h1>
+      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
+        نوع قص مُستخدَم لا يُحذف — يُخفى فقط.
+      </p>
+      <div data-cuts>
+        <p class="admin-card">جارٍ التحميل…</p>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="admin-section" data-page="categories">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الفئات</h1>
+      <div data-categories>
+        <p class="admin-card">جارٍ التحميل…</p>
+      </div>
+    </section>
+
+    <!-- Data view -->
+    <section class="admin-section" data-page="data">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">عرض البيانات</h1>
+      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
+        نافذة على قاعدة البيانات. اقرأ، صفِّ، صدّر CSV — دون أي خدمة خارجية.
+      </p>
+      <div data-data-view></div>
+    </section>
+
+    <!-- Private links -->
+    <section class="admin-section" data-page="links">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">روابط خاصة</h1>
+      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
+        روابط noindex لعرض خاص أو أسعار متفق عليها لعميل مؤكّد.
+      </p>
+      <div data-private-links>
+        <p class="admin-card">جارٍ التحميل…</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Floating Add button (three-field quick add, §7) -->
+  <button class="admin-fab" aria-label="إضافة صنف جديد">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  </button>
+
+  <!-- Modal sheet -->
+  <div class="admin-modal" data-open="false" role="dialog" aria-modal="true">
+    <div class="admin-modal__sheet">
+      <h2 class="admin-modal__title" data-modal-title></h2>
+      <div data-modal-body></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="admin-toast" data-visible="false" role="status" aria-live="polite"></div>
+
+  <!-- Bottom nav — thumb at the bottom (§7) -->
+  <nav class="admin-bottom-nav" aria-label="التنقّل الرئيسي">
+    <a class="admin-bottom-nav__item" data-nav="today" href="#today" data-active="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+      </svg>
+      <span>اليوم</span>
+    </a>
+    <a class="admin-bottom-nav__item" data-nav="leads" href="#leads">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z"/>
+      </svg>
+      <span>الليds</span>
+    </a>
+    <a class="admin-bottom-nav__item" data-nav="products" href="#products">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="8" width="13" height="10" rx="2"/>
+        <path d="M16 11h3l2 3v4h-5"/>
+      </svg>
+      <span>الأصناف</span>
+    </a>
+    <a class="admin-bottom-nav__item" data-nav="settings" href="#settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+      </svg>
+      <span>الإعدادات</span>
+    </a>
+  </nav>
+
+  <!-- Hidden menu items reachable via hash — restaurants, cuts, categories, data, links -->
+  <nav aria-hidden="true" style="display:none">
+    <a data-nav="restaurants" href="#restaurants"></a>
+    <a data-nav="cuts" href="#cuts"></a>
+    <a data-nav="categories" href="#categories"></a>
+    <a data-nav="data" href="#data"></a>
+    <a data-nav="links" href="#links"></a>
+  </nav>
+
+  <script src="/js/dashboard.js" defer></script>
+</body>
+</html>
