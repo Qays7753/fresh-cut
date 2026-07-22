@@ -202,6 +202,7 @@ async function handleLeadSubmit(request, env, ctx) {
     // (per form-submit-order skill). We signal failure and let
     // the client open WhatsApp with the same data and store
     // the request locally.
+    console.error('LEAD_SAVE_ERROR:', (err && (err.stack || err.message)) || String(err));
     return json({ ok: false, error: 'save_failed',
       fallback: {
         type, restaurantName: body.restaurantName,
