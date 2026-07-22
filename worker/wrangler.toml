@@ -1,0 +1,27 @@
+name = "alyaf-alshamal-api"
+main = "src/index.js"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 binding — create the database first:
+#   wrangler d1 create alyaf-alshamal
+#   (copy the database_id below)
+[[d1_databases]]
+binding       = "DB"
+database_name = "alyaf-alshamal"
+database_id   = "REPLACE_WITH_D1_DATABASE_ID"
+
+# Vars (non-secret). Set via dashboard or wrangler:
+#   wrangler secret put MAILCHANNELS_KEY
+[vars]
+ADMIN_ORIGIN = "https://alyaf-alshamal-admin.pages.dev"
+
+# Cloudflare Access protects /api/admin/* — see README §Cloudflare Access.
+# The worker verifies the Cf-Access-Jwt-Assertion header on every admin
+# request. Cloudflare Access itself does the actual JWT verification at
+# the edge before the request reaches the worker.
+
+# Deploy hook (called by the dashboard after settings/product edits to
+# trigger a rebuild of the public site):
+#   wrangler pages deploy-hook create alyaf-alshamal --project alyaf-alshamal
+# The dashboard worker calls this URL with a POST after each save.
