@@ -71,34 +71,6 @@ export default {
       return json({ catalog, settings }, corsHeaders(env));
     }
 
-    // ---------- TEMP debug: test the write path directly via GET ----------
-    // Visit /api/debug-write in a browser to run the same DB writes the
-    // lead form does, and return the real error if any. REMOVE after use.
-    if (path === '/api/debug-write' && method === 'GET') {
-      try {
-        const rid = await createRestaurant(env.DB, {
-          actor: 'debug', name: '__debug__', area: '__test__', address: null, notes: null,
-        });
-        const cid = await createContact(env.DB, {
-          actor: 'debug', restaurantId: rid, name: 'debug', phone: '0790000000',
-          role: null, isPrimary: true,
-        });
-        const seq = await nextLeadRefSeq(env.DB);
-        const ref = formatLeadRef(seq);
-        const { id } = await createLead(env.DB, {
-          actor: 'debug', ref, restaurantId: rid, contactId: cid, type: 'sample',
-          items: null, topItemsAr: null, source: 'debug', whatsappOpened: false,
-        });
-        return json({ ok: true, leadId: id, ref }, corsHeaders(env));
-      } catch (err) {
-        return json({
-          ok: false,
-          error: String((err && err.message) || err),
-          stack: String((err && err.stack) || ''),
-        }, corsHeaders(env));
-      }
-    }
-
     // ---------- public lead submit ----------
     if (path === '/api/leads' && method === 'POST') {
       return handleLeadSubmit(request, env, ctx);
