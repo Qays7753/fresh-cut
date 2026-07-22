@@ -1,0 +1,669 @@
+<!-- build/templates/header.html -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ألياف الشمال — خضار مقطّعة جاهزة للمطاعم</title>
+  <meta name="description" content="[[وصف مختصر للموقع لنتائج البحث — يستبدل من الإعدادات]]">
+  <meta name="theme-color" content="#0E3D24">
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="alternate" hreflang="ar" href="/ar/">
+  <link rel="alternate" hreflang="x-default" href="/ar/">
+
+  <!-- Preload primary font weight 400 (used for body, LCP text) -->
+  <link rel="preload" href="/fonts/IBM-Plex-Sans-Arabic-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/IBM-Plex-Sans-Arabic-700.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Tokens first, then site styles -->
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/site.css">
+
+  <!-- Schema.org LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "ألياف الشمال",
+    "areaServed": "Amman, Jordan",
+    "telephone": "+962777717753",
+    "url": "https://alyaf-alshamal.pages.dev/ar/"
+  }
+  </script>
+</head>
+<body>
+  <!-- Skip link for keyboard users -->
+  <a href="#main" class="skip-link" style="position:absolute;inset-inline-start:-9999px;top:0;background:var(--white);color:var(--green);padding:var(--space-2);z-index:200;">تخطّى إلى المحتوى</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a href="/ar/" class="brand" aria-label="ألياف الشمال — الصفحة الرئيسية">
+        ألياف الشمال
+        <svg class="brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v18M5 7c3 2 4 4 7 4s4-2 7-4M5 12c3 2 4 4 7 4s4-2 7-4M5 17c3 2 4 4 7 4s4-2 7-4"/>
+        </svg>
+      </a>
+      <nav class="nav-desktop" aria-label="التنقّل الرئيسي">
+        <a href="#catalog">الأصناف</a>
+        <a href="#why">لماذا نحن</a>
+        <a href="#sample">عيّنة</a>
+        <a href="#contact">تواصل</a>
+      </nav>
+      <button class="hamburger" type="button" aria-label="فتح القائمة" data-menu-open>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+          <line x1="4" y1="7" x2="20" y2="7"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <line x1="4" y1="17" x2="20" y2="17"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Full-screen mobile menu (§9) -->
+  <div class="menu-overlay" data-open="false" role="dialog" aria-modal="true" aria-label="القائمة">
+    <button class="menu-overlay__close" type="button" aria-label="إغلاق القائمة" data-menu-close>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+        <line x1="6" y1="6" x2="18" y2="18"/>
+        <line x1="18" y1="6" x2="6" y2="18"/>
+      </svg>
+    </button>
+    <nav class="menu-overlay__links" aria-label="روابط القائمة">
+      <a href="#catalog" data-menu-close>الأصناف</a>
+      <a href="#why" data-menu-close>لماذا نحن</a>
+      <a href="#sample" data-menu-close>عيّنة</a>
+      <a href="#contact" data-menu-close>تواصل</a>
+    </nav>
+    <a href="#sample" class="btn btn--primary menu-overlay__cta" data-menu-close>اطلب عيّنة مجانية</a>
+  </div>
+
+  <main id="main">
+
+    <!-- Hero (§6.2) — asymmetric, 85vh mobile / 90vh desktop, NOT 100vh -->
+    <section class="hero">
+      <div class="container hero__inner" style="display:contents;">
+        <div class="hero__text">
+          <span class="hero__eyebrow">ألياف الشمال</span>
+          <h1 class="hero__title">خضار مقطّعة طازجة، جاهزة للطهي، تصلك يومياً</h1>
+          <p class="hero__support">[[سطر داعم تحت العنوان — يستبدل من الإعدادات]]</p>
+          <a href="#sample" class="btn btn--primary hero__cta" data-order-sample>
+            اطلب عيّنة مجانية
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </a>
+        </div>
+        <div class="hero__visual">
+          <img class="hero__image"
+               src="/img/hero-placeholder.svg"
+               alt="ألياف الشمال — خضار مقطّعة طازجة"
+               width="1280" height="720"
+               fetchpriority="high" decoding="async">
+        </div>
+      </div>
+    </section>
+
+    <!-- Value strip (§6.3) -->
+    <section class="value-strip">
+      <div class="container">
+        <ul class="value-strip__grid">
+          <li class="value-item">
+            <svg class="value-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="8" width="13" height="10" rx="2"/>
+              <path d="M16 11h3l2 3v4h-5"/>
+              <circle cx="7" cy="19" r="1.5"/>
+              <circle cx="17" cy="19" r="1.5"/>
+            </svg>
+            <span class="value-item__text">توصيل يومي للمطاعم في عمّان</span>
+          </li>
+          <li class="value-item">
+            <svg class="value-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 3v6M11 3v6M15 3v6"/>
+              <path d="M4 9h16l-1 12H5L4 9z"/>
+            </svg>
+            <span class="value-item__text">تقطيع حسب الطلب — جاهز للطهي مباشرة</span>
+          </li>
+          <li class="value-item">
+            <svg class="value-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 7v5l3 2"/>
+            </svg>
+            <span class="value-item__text">[[نقطة قيمة ثالثة — تستبدل من الإعدادات]]</span>
+          </li>
+          <li class="value-item">
+            <svg class="value-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12l4 4L19 6"/>
+            </svg>
+            <span class="value-item__text">[[نقطة قيمة رابعة — تستبدل من الإعدادات]]</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Catalog (§6.4) — all items exposed, no hidden tabs -->
+    <section class="section" id="catalog">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-head__eyebrow">الكتالوج</span>
+          <h2 class="section-head__title">الأصناف</h2>
+          <p class="section-head__sub">كل الأصناف مكشوفة — لا تبويب يخفي شيئاً</p>
+        </div>
+        <div class="catalog__grid">
+          
+      <div class="catalog__category-head">
+        <span class="catalog__category-name">ورقيات</span>
+        <span class="catalog__category-count">3 صنف</span>
+      </div>
+      <!-- build/templates/product-row.html -->
+<article class="product-card" id="product-leafy-01">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_leafy.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-leafy-02">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_leafy.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-leafy-03">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_leafy.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+    
+
+      <div class="catalog__category-head">
+        <span class="catalog__category-name">بصل وثوم</span>
+        <span class="catalog__category-count">3 صنف</span>
+      </div>
+      <!-- build/templates/product-row.html -->
+<article class="product-card" id="product-onion-01">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_onion_garlic.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مكعبات</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-onion-02">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_onion_garlic.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مقطع شرائح</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-onion-03">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_onion_garlic.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+    
+
+      <div class="catalog__category-head">
+        <span class="catalog__category-name">جذور</span>
+        <span class="catalog__category-count">3 صنف</span>
+      </div>
+      <!-- build/templates/product-row.html -->
+<article class="product-card" id="product-roots-01">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_roots.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>أصابع/باطوني</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-roots-02">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_roots.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>جوليان</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-roots-03">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_roots.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مكعبات</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+    
+
+      <div class="catalog__category-head">
+        <span class="catalog__category-name">خلطات جاهزة</span>
+        <span class="catalog__category-count">3 صنف</span>
+      </div>
+      <!-- build/templates/product-row.html -->
+<article class="product-card" id="product-mixes-01">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_mixes.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-mixes-02">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_mixes.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-mixes-03">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/placeholder-cat_mixes.svg"
+         alt="[[اسم الصنف]]"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">[[اسم الصنف]]</h3>
+    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+    
+        </div>
+      </div>
+    </section>
+
+    <!-- Why us (§6.5) — asymmetric block with full-bleed left -->
+    <section class="section why" id="why">
+      <div class="container">
+        <div class="why__inner">
+          <div class="why__media">
+            <img src="/img/why-placeholder.svg"
+                 alt="لماذا ألياف الشمال"
+                 width="800" height="600"
+                 loading="lazy" decoding="async">
+          </div>
+          <div class="why__text">
+            <span class="section-head__eyebrow">لماذا نحن</span>
+            <h2 class="section-head__title">لماذا ألياف الشمال</h2>
+            <p class="section-head__sub">[[نص قسم «لماذا نحن» — يستبدل من الإعدادات]]</p>
+            <ul class="why__points">
+              <li class="why__point">
+                <svg class="why__point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 3v18M5 7c3 2 4 4 7 4s4-2 7-4"/>
+                </svg>
+                <span>تقطيع طازج حسب الطلب — يصل جاهزاً للطهي مباشرة</span>
+              </li>
+              <li class="why__point">
+                <svg class="why__point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="8" width="13" height="10" rx="2"/>
+                  <path d="M16 11h3l2 3v4h-5"/>
+                </svg>
+                <span>توصيل يومي للمطاعم في عمّان</span>
+              </li>
+              <li class="why__point">
+                <svg class="why__point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 12l4 4L21 6"/>
+                </svg>
+                <span>معايير ثابتة — نفس الجودة والكمية كل يوم</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sample section (§6.6) -->
+    <section class="section sample" id="sample">
+      <div class="container">
+        <div class="sample__inner">
+          <div class="sample__text">
+            <h2 class="sample__title">اطلب عيّنة مجانية</h2>
+            <p class="sample__body">[[نص قسم العيّنة — يستبدل من الإعدادات]]</p>
+            <a href="#contact" class="btn btn--primary" data-order-sample>اطلب عيّنة مجانية</a>
+          </div>
+          <div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact form (§6.7, §5.7, §7.2) -->
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-head__eyebrow">تواصل</span>
+          <h2 class="section-head__title">تواصل معنا</h2>
+          <p class="section-head__sub">املأ الطلب وسنردّ عليك على واتساب خلال ساعات</p>
+        </div>
+
+        <div class="contact__inner">
+          <div class="contact__info">
+            <div class="contact__info-row">
+              <svg class="contact__info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z"/>
+              </svg>
+              <div>
+                <strong>واتساب</strong><br>
+                <bdi>0777717753</bdi>
+              </div>
+            </div>
+            <div class="contact__info-row">
+              <svg class="contact__info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="8" width="13" height="10" rx="2"/>
+                <path d="M16 11h3l2 3v4h-5"/>
+                <circle cx="7" cy="19" r="1.5"/>
+                <circle cx="17" cy="19" r="1.5"/>
+              </svg>
+              <div>
+                <strong>التوصيل</strong><br>
+                [[مناطق التوصيل — يستبدل من الإعدادات]]<br>
+                [[أيام التوصيل — يستبدل من الإعدادات]]
+              </div>
+            </div>
+            <div class="contact__info-row">
+              <svg class="contact__info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 7v5l3 2"/>
+              </svg>
+              <div>
+                <strong>آخر موعد للطلب</strong><br>
+                قبل يومين من التوصيل
+              </div>
+            </div>
+          </div>
+
+          <!-- Form + confirmation screen side by side -->
+          <div>
+            <form class="form" data-lead-form novalidate>
+              <input type="hidden" name="type" value="sample">
+              <input type="hidden" name="source" value="">
+              <!-- Honeypot: bots fill this; humans never see it -->
+              <div class="field__honeypot" aria-hidden="true">
+                <label>لا تملأ هذا الحقل
+                  <input type="text" name="company_url" tabindex="-1" autocomplete="off">
+                </label>
+              </div>
+
+              <div class="form__row form__row--2">
+                <div class="field" data-field="restaurant_name">
+                  <label class="field__label" for="f-rest">اسم المطعم</label>
+                  <input class="field__input" id="f-rest" name="restaurant_name"
+                         type="text" required autocomplete="organization">
+                  <span class="field__error"></span>
+                </div>
+                <div class="field" data-field="contact_name">
+                  <label class="field__label" for="f-name">اسم الشخص</label>
+                  <input class="field__input" id="f-name" name="contact_name"
+                         type="text" required autocomplete="name">
+                  <span class="field__error"></span>
+                </div>
+              </div>
+
+              <div class="form__row form__row--2">
+                <div class="field" data-field="phone">
+                  <label class="field__label" for="f-phone">رقم الهاتف</label>
+                  <input class="field__input" id="f-phone" name="phone"
+                         type="tel" inputmode="tel" required autocomplete="tel"
+                         placeholder="07XXXXXXXX" dir="ltr">
+                  <span class="field__error"></span>
+                </div>
+                <div class="field" data-field="area">
+                  <label class="field__label" for="f-area">المنطقة</label>
+                  <input class="field__input" id="f-area" name="area"
+                         type="text" required autocomplete="address-level2">
+                  <span class="field__error"></span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="f-items">الأصناف المطلوبة</label>
+                <textarea class="field__textarea" id="f-items" name="items"
+                          placeholder="مثال: بقدونس مفروم، نعناع مفروم، بصل مكعبات"></textarea>
+                <span class="field__hint">يُعبّأ تلقائياً عند الضغط على «اطلب عيّنة» من أي صنف.</span>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="f-top">ما أهم ثلاثة أصناف تستهلكها أسبوعياً؟</label>
+                <textarea class="field__textarea" id="f-top" name="top_items"
+                          rows="2"></textarea>
+              </div>
+
+              <p class="form__data-use">نستخدم رقمك للتواصل معك بخصوص طلبك فقط</p>
+
+              <button class="btn btn--primary form__submit" type="submit">
+                إرسال الطلب
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M19 12H5M12 5l-7 7 7 7"/>
+                </svg>
+              </button>
+
+              <div data-form-error role="alert" style="display:none;"></div>
+            </form>
+
+            <!-- Confirmation screen (post-submit) -->
+            <div class="confirm" data-confirm>
+              <h2 class="confirm__title">وصلنا طلبك</h2>
+              <p class="confirm__body">سنردّ عليك على واتساب قبل الساعة 10 صباحاً</p>
+              <p class="confirm__ref" data-confirm-ref></p>
+              <p class="confirm__body" data-confirm-reply></p>
+              <a class="btn btn--primary confirm__whatsapp" data-confirm-whatsapp target="_blank" rel="noopener">
+                افتح واتساب
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <script>window.__ALYAF_SETTINGS__={"brand_name":"ألياف الشمال","brand_name_en":"Alyaf Al-Shamal","page_title":"ألياف الشمال — خضار مقطّعة جاهزة للمطاعم","meta_desc":"[[وصف مختصر للموقع لنتائج البحث — يستبدل من الإعدادات]]","whatsapp_number":"0777717753","notification_email":"businesses.access.25@gmail.com","order_cutoff":"قبل يومين من التوصيل","delivery_days":"[[أيام التوصيل — يستبدل من الإعدادات]]","delivery_areas":"[[مناطق التوصيل — يستبدل من الإعدادات]]","minimum_order":"[[الحد الأدنى للطلب — يستبدل من الإعدادات]]","replacement_policy":"[[سياسة الاستبدال — تستبدل من الإعدادات]]","payment_methods":"[[طرق الدفع — تستبدل من الإعدادات]]","hero_title":"خضار مقطّعة طازجة، جاهزة للطهي، تصلك يومياً","hero_support":"[[سطر داعم تحت العنوان — يستبدل من الإعدادات]]","hero_cta":"اطلب عيّنة مجانية","value_point_1":"توصيل يومي للمطاعم في عمّان","value_point_2":"تقطيع حسب الطلب — جاهز للطهي مباشرة","value_point_3":"[[نقطة قيمة ثالثة — تستبدل من الإعدادات]]","value_point_4":"[[نقطة قيمة رابعة — تستبدل من الإعدادات]]","catalog_heading":"الأصناف","catalog_sub":"كل الأصناف مكشوفة — لا تبويب يخفي شيئاً","why_heading":"لماذا ألياف الشمال","why_body":"[[نص قسم «لماذا نحن» — يستبدل من الإعدادات]]","sample_heading":"اطلب عيّنة مجانية","sample_body":"[[نص قسم العيّنة — يستبدل من الإعدادات]]","form_heading":"تواصل معنا","form_body":"املأ الطلب وسنردّ عليك على واتساب خلال ساعات","data_use_line":"نستخدم رقمك للتواصل معك بخصوص طلبك فقط","confirm_title":"وصلنا طلبك","confirm_body":"سنردّ عليك على واتساب قبل الساعة 10 صباحاً","confirm_cta":"افتح واتساب","wa_sample_template":"مرحباً، أرغب بطلب عيّنة. رقم المرجع: {{ref}}","wa_supply_template":"مرحباً، أرغب بطلب توريد. رقم المرجع: {{ref}}","footer_rights":"© ألياف الشمال — جميع الحقوق محفوظة"};window.__ALYAF_CATALOG__={"categories":[{"id":"cat_leafy","name_ar":"ورقيات","name_en":"Leafy Greens"},{"id":"cat_onion_garlic","name_ar":"بصل وثوم","name_en":"Onion & Garlic"},{"id":"cat_roots","name_ar":"جذور","name_en":"Roots"},{"id":"cat_mixes","name_ar":"خلطات جاهزة","name_en":"Mixes"}],"products":[{"id":"prd_leafy_01","slug":"leafy-01","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_leafy","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_leafy_02","slug":"leafy-02","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_leafy","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_leafy_03","slug":"leafy-03","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_leafy","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_01","slug":"onion-01","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_onion_garlic","cut":"مكعبات","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_02","slug":"onion-02","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_onion_garlic","cut":"مقطع شرائح","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_03","slug":"onion-03","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_onion_garlic","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_roots_01","slug":"roots-01","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_roots","cut":"أصابع/باطوني","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_roots_02","slug":"roots-02","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_roots","cut":"جوليان","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_roots_03","slug":"roots-03","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_roots","cut":"مكعبات","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_mixes_01","slug":"mixes-01","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_mixes","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_mixes_02","slug":"mixes-02","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_mixes","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_mixes_03","slug":"mixes-03","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_mixes","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null}]};</script>
+    </main>
+
+  <!-- Footer (§6.8) -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div>
+        <div class="site-footer__brand">ألياف الشمال</div>
+        <p class="site-footer__contact">
+          خضار مقطّعة جاهزة للمطاعم في عمّان.<br>
+          واتساب: <bdi>0777717753</bdi>
+        </p>
+      </div>
+      <div class="site-footer__col">
+        <h4>روابط</h4>
+        <a href="#catalog">الأصناف</a>
+        <a href="#why">لماذا نحن</a>
+        <a href="#sample">اطلب عيّنة</a>
+        <a href="#contact">تواصل</a>
+      </div>
+      <div class="site-footer__col">
+        <h4>التوصيل</h4>
+        <p class="site-footer__contact">
+          [[مناطق التوصيل — يستبدل من الإعدادات]]<br>
+          [[أيام التوصيل — يستبدل من الإعدادات]]<br>
+          الطلب: قبل يومين من التوصيل
+        </p>
+      </div>
+    </div>
+    <div class="container">
+      <p class="site-footer__rights">© ألياف الشمال — جميع الحقوق محفوظة</p>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp — bottom-LEFT for RTL, mobile only (§5.11) -->
+  <a class="fab-whatsapp"
+     href="https://wa.me/962777717753?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1"
+     aria-label="راسلنا على واتساب"
+     target="_blank" rel="noopener">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z"/>
+      <path d="M9 9.5c.5-1.5 2-1.5 2.5 0 .3.8-.5 1.5-.5 1.5s.5 1.5 1.5 2.5c1 .8 2 .5 2 .5"/>
+    </svg>
+  </a>
+
+  <!-- Sticky bottom sample bar — mobile only (§5.11) -->
+  <div class="sample-bar" data-visible="false">
+    <a href="#sample" class="btn btn--primary sample-bar__btn">اطلب عيّنة مجانية</a>
+  </div>
+
+  <script src="/js/site.js" defer></script>
+</body>
+</html>

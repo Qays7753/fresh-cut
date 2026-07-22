@@ -1,0 +1,52 @@
+  </main>
+
+  <!-- Footer (§6.8) -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div>
+        <div class="site-footer__brand">{{BRAND_NAME}}</div>
+        <p class="site-footer__contact">
+          خضار مقطّعة جاهزة للمطاعم في عمّان.<br>
+          واتساب: <bdi>{{WHATSAPP_DISPLAY}}</bdi>
+        </p>
+      </div>
+      <div class="site-footer__col">
+        <h4>روابط</h4>
+        <a href="#catalog">الأصناف</a>
+        <a href="#why">لماذا نحن</a>
+        <a href="#sample">اطلب عيّنة</a>
+        <a href="#contact">تواصل</a>
+      </div>
+      <div class="site-footer__col">
+        <h4>التوصيل</h4>
+        <p class="site-footer__contact">
+          {{DELIVERY_AREAS}}<br>
+          {{DELIVERY_DAYS}}<br>
+          الطلب: {{ORDER_CUTOFF}}
+        </p>
+      </div>
+    </div>
+    <div class="container">
+      <p class="site-footer__rights">{{FOOTER_RIGHTS}}</p>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp — bottom-LEFT for RTL, mobile only (§5.11) -->
+  <a class="fab-whatsapp"
+     href="https://wa.me/962{{WHATSAPP_DIGITS}}?text={{WHATSAPP_DEFAULT_TEXT}}"
+     aria-label="راسلنا على واتساب"
+     target="_blank" rel="noopener">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z"/>
+      <path d="M9 9.5c.5-1.5 2-1.5 2.5 0 .3.8-.5 1.5-.5 1.5s.5 1.5 1.5 2.5c1 .8 2 .5 2 .5"/>
+    </svg>
+  </a>
+
+  <!-- Sticky bottom sample bar — mobile only (§5.11) -->
+  <div class="sample-bar" data-visible="false">
+    <a href="#sample" class="btn btn--primary sample-bar__btn">{{HERO_CTA}}</a>
+  </div>
+
+  <script src="/js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "alyaf-alshamal",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build/build-public.js",
+    "build:live": "D1_DATABASE_ID=$D1_DATABASE_ID CF_API_TOKEN=$CF_API_TOKEN CF_ACCOUNT_ID=$CF_ACCOUNT_ID node build/build-public.js"
+  }
+}

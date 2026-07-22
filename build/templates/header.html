@@ -1,0 +1,80 @@
+<!-- build/templates/header.html -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{{PAGE_TITLE}}</title>
+  <meta name="description" content="{{META_DESC}}">
+  <meta name="theme-color" content="#0E3D24">
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="alternate" hreflang="ar" href="/ar/">
+  <link rel="alternate" hreflang="x-default" href="/ar/">
+
+  <!-- Preload primary font weight 400 (used for body, LCP text) -->
+  <link rel="preload" href="/fonts/IBM-Plex-Sans-Arabic-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/IBM-Plex-Sans-Arabic-700.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Tokens first, then site styles -->
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/site.css">
+
+  <!-- Schema.org LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "{{BRAND_NAME}}",
+    "areaServed": "Amman, Jordan",
+    "telephone": "+962{{WHATSAPP_DIGITS}}",
+    "url": "{{SITE_URL}}/ar/"
+  }
+  </script>
+</head>
+<body>
+  <!-- Skip link for keyboard users -->
+  <a href="#main" class="skip-link" style="position:absolute;inset-inline-start:-9999px;top:0;background:var(--white);color:var(--green);padding:var(--space-2);z-index:200;">تخطّى إلى المحتوى</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a href="/ar/" class="brand" aria-label="{{BRAND_NAME}} — الصفحة الرئيسية">
+        {{BRAND_NAME}}
+        <svg class="brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v18M5 7c3 2 4 4 7 4s4-2 7-4M5 12c3 2 4 4 7 4s4-2 7-4M5 17c3 2 4 4 7 4s4-2 7-4"/>
+        </svg>
+      </a>
+      <nav class="nav-desktop" aria-label="التنقّل الرئيسي">
+        <a href="#catalog">الأصناف</a>
+        <a href="#why">لماذا نحن</a>
+        <a href="#sample">عيّنة</a>
+        <a href="#contact">تواصل</a>
+      </nav>
+      <button class="hamburger" type="button" aria-label="فتح القائمة" data-menu-open>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+          <line x1="4" y1="7" x2="20" y2="7"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <line x1="4" y1="17" x2="20" y2="17"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Full-screen mobile menu (§9) -->
+  <div class="menu-overlay" data-open="false" role="dialog" aria-modal="true" aria-label="القائمة">
+    <button class="menu-overlay__close" type="button" aria-label="إغلاق القائمة" data-menu-close>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+        <line x1="6" y1="6" x2="18" y2="18"/>
+        <line x1="18" y1="6" x2="6" y2="18"/>
+      </svg>
+    </button>
+    <nav class="menu-overlay__links" aria-label="روابط القائمة">
+      <a href="#catalog" data-menu-close>الأصناف</a>
+      <a href="#why" data-menu-close>لماذا نحن</a>
+      <a href="#sample" data-menu-close>عيّنة</a>
+      <a href="#contact" data-menu-close>تواصل</a>
+    </nav>
+    <a href="#sample" class="btn btn--primary menu-overlay__cta" data-menu-close>{{HERO_CTA}}</a>
+  </div>
+
+  <main id="main">

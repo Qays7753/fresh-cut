@@ -1,0 +1,20 @@
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-{{SLUG}}">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="{{IMG_SRC}}"
+         alt="{{NAME_AR}}"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--{{AVAILABILITY_CLASS}}">{{AVAILABILITY_LABEL}}</span>
+    <h3 class="product-card__title">{{NAME_AR}}</h3>
+    <p class="product-card__desc">{{SUMMARY_AR}}</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>{{CUT_NAME_AR}}</b></span>
+      <span class="product-card__meta-item">العبوة: <b>{{PACK_SIZE}}</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>{{SHELF_LIFE}}</b></span>
+    </div>
+  </div>
+</article>
