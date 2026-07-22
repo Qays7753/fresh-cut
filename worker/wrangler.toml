@@ -3,6 +3,12 @@ main = "src/index.js"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 
+# No public *.workers.dev URL. The worker is reached ONLY through the `API`
+# service binding from the two Pages projects (public site + dashboard).
+# This keeps the admin namespace unreachable from the open internet, so a
+# forged Cf-Access-* header can never hit it directly.
+workers_dev = false
+
 # D1 binding — create the database first:
 #   wrangler d1 create alyaf-alshamal
 #   (copy the database_id below)
