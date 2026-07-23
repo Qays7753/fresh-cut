@@ -13,6 +13,8 @@ import {
 } from './queries.js';
 import { sendLeadNotification } from './email.js';
 import { handleAdmin } from './handlers/admin.js';
+import { mintSession, verifySessionToken, verifyPassword,
+        sessionCookie, clearSessionCookie, extractToken } from './auth.js';
 
 // ---- CORS / headers ----------------------------------------
 
@@ -24,9 +26,23 @@ const HEADERS = {
 
 function corsHeaders(env) {
   const allow = env.ADMIN_ORIGIN ? env.ADMIN_ORIGIN : '*';
-  return { 'Access-Control-Allow-Origin': allow,
-           'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
-           'Access-Control-Allow-Headers': 'Content-Type' };
+  // Allow-Credentials is needed for the httpOnly session cookie to be
+  // sent cross-origin (dashboard.pages.dev → worker). When credentials
+  // are allowed, the Allow-Origin must NOT be '*' — it has to be the
+  // explicit dashboard origin. For the same-origin dashboard proxy
+  // path (dashboard/_worker.js → env.API.fetch), the request is
+  // same-origin and the cookie flows regardless.
+  const headers = {
+    'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+  if (env.ADMIN_ORIGIN) {
+    headers['Access-Control-Allow-Origin'] = env.ADMIN_ORIGIN;
+    headers['Access-Control-Allow-Credentials'] = 'true';
+  } else {
+    headers['Access-Control-Allow-Origin'] = allow;
+  }
+  return headers;
 }
 
 // ---- rate limiter (per-IP, in D1, 5 form submits / hour) ---
@@ -86,17 +102,29 @@ export default {
     }
 
     // ---------- admin namespace ----------
+    // Internal password auth (replaces Cloudflare Access).
+    // POST /api/admin/login  → verify password, mint session cookie.
+    // POST /api/admin/logout → clear session cookie.
+    // All other /api/admin/* require a valid session token (cookie or
+    // Authorization: Bearer). public/_worker.js still hard-blocks
+    // /api/admin/* from the public origin, so login is only reachable
+    // via the dashboard proxy (which sits behind this same auth).
     if (path.startsWith('/api/admin/')) {
-      // Cloudflare Access protects this namespace at the edge.
-      // The worker additionally verifies the Cf-Access-Jwt-Assertion
-      // header presence (real verification is done by Access itself).
-      const accessJwt = request.headers.get('Cf-Access-Jwt-Assertion');
-      if (!accessJwt) {
+      const sub = path.slice('/api/admin/'.length);
+
+      if (sub === 'login' && method === 'POST') {
+        return handleLogin(request, env);
+      }
+      if (sub === 'logout' && method === 'POST') {
+        return handleLogout(env);
+      }
+
+      // Everything else: verify the session token.
+      const payload = await verifySessionToken(env, extractToken(request));
+      if (!payload) {
         return json({ error: 'unauthorized' }, { ...corsHeaders(env), status: 401 });
       }
-      // Actor email is set by Cloudflare Access in this header.
-      const actor = request.headers.get('Cf-Access-Authenticated-User-Email') || 'admin';
-      return handleAdmin(request, env, ctx, actor);
+      return handleAdmin(request, env, ctx, payload.sub || 'admin');
     }
 
     return json({ error: 'not_found' }, { ...corsHeaders(env), status: 404 });
@@ -108,6 +136,79 @@ function json(body, headers = {}, status = 200) {
     status,
     headers: { ...HEADERS, ...headers },
   });
+}
+
+// ---- admin login / logout -----------------------------------
+// POST /api/admin/login  { password } → Set-Cookie + 200 { ok, exp }
+// POST /api/admin/logout                 → Set-Cookie (clear) + 200 { ok }
+//
+// Login is rate-limited per-IP (10 attempts/hour) using the _kv shim.
+// Password is verified constant-time against ADMIN_PASSWORD_HASH.
+// On success, a 12h HMAC-signed session token is issued as an httpOnly
+// cookie. The dashboard proxy passes the cookie through unchanged.
+
+async function handleLogin(request, env) {
+  const ip = request.headers.get('CF-Connecting-IP') || '';
+
+  // Rate-limit login attempts (10/hour/IP) to blunt brute force.
+  if (await loginRateLimited(env, ip)) {
+    return json({ error: 'rate_limited' }, corsHeaders(env), 429);
+  }
+
+  let body;
+  try { body = await request.json(); }
+  catch { return json({ error: 'bad_json' }, corsHeaders(env), 400); }
+
+  const password = body && body.password ? String(body.password) : '';
+  const ok = await verifyPassword(env, password);
+  ctx_log_login_attempt(env, ip, ok);
+
+  if (!ok) {
+    await bumpLoginRate(env, ip);
+    return json({ error: 'invalid_credentials' }, corsHeaders(env), 401);
+  }
+
+  const { token, exp } = await mintSession(env);
+  const headers = { ...corsHeaders(env),
+    'Set-Cookie': sessionCookie(token) };
+  return json({ ok: true, exp }, headers);
+}
+
+async function handleLogout(env) {
+  const headers = { ...corsHeaders(env),
+    'Set-Cookie': clearSessionCookie() };
+  return json({ ok: true }, headers);
+}
+
+// Best-effort audit log of login attempts (fire-and-forget).
+// A failed login doesn't write a per-lead audit row, but a short
+// marker in _kv helps with rate-limiting; the bumpLoginRate call
+// below records the attempt.
+function ctx_log_login_attempt(env, ip, ok) {
+  // Intentionally a no-op besides rate-limit accounting — the
+  // bumpLoginRate call inside handleLogin covers persistence.
+  // Successful logins could be audited via the queries.audit()
+  // layer, but that requires the D1 binding; we keep this layer
+  // dependency-free for resilience.
+}
+
+async function loginRateLimited(env, ip) {
+  if (!ip) return false;
+  const key = `login:${ip}:${Math.floor(Date.now() / 3600000)}`;
+  const row = await env.DB.prepare(`SELECT value FROM _kv WHERE key = ?`).bind(key).first();
+  return row ? Number(row.value) >= 10 : false;
+}
+
+async function bumpLoginRate(env, ip) {
+  if (!ip) return;
+  const key = `login:${ip}:${Math.floor(Date.now() / 3600000)}`;
+  const row = await env.DB.prepare(`SELECT value FROM _kv WHERE key = ?`).bind(key).first();
+  const n = row ? Number(row.value) + 1 : 1;
+  if (row) {
+    await env.DB.prepare(`UPDATE _kv SET value = ? WHERE key = ?`).bind(String(n), key).run();
+  } else {
+    await env.DB.prepare(`INSERT INTO _kv (key, value) VALUES (?, ?)`).bind(key, String(n)).run();
+  }
 }
 
 // ---- lead submit handler (form-submit-order) ---------------

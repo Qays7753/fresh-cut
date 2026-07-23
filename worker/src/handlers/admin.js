@@ -1,14 +1,16 @@
 // worker/src/handlers/admin.js
-// Admin namespace router. Every /api/admin/* route lands here.
-// Cloudflare Access already verified the JWT at the edge; we
-// receive the actor's email in a header and pass it down to
-// the query-isolation layer for audit logging.
+// Admin namespace router. Every /api/admin/* route lands here
+// (except login/logout, which are handled in index.js). The caller
+// (index.js) has already verified the internal session token and
+// passes the actor identity down for audit logging.
 
 import {
   listLeads, getLead, computeLeadStatus, listToday,
   listProducts, createProduct, updateProduct, bulkUpdateVariantAvailability,
-  listVariants, updateVariant,
+  listVariants, updateVariant, createVariant,
   listCuts, listCategories, createCut, createCategory, hideCut, hideCategory,
+  updateCut, updateCategory,
+  softDeleteProduct, softDeleteCategory, softDeleteCut, softDeleteVariant,
   listRestaurants, getSettings, updateSetting,
   listPrivateLinks, createPrivateLink, exportTable,
   createImage, listImages, getImage, updateImage, hideImage, softDeleteImage,
@@ -80,8 +82,18 @@ async function routeAdmin(request, env, ctx, actor) {
     await updateProduct(env.DB, { actor, id, fields });
     return json({ ok: true });
   }
+  if (path.startsWith('products/') && path.endsWith('/delete') && method === 'POST') {
+    const id = path.split('/')[1];
+    await softDeleteProduct(env.DB, { actor, id });
+    return json({ ok: true });
+  }
 
   // ---- Variants ----
+  if (path === 'variants' && method === 'POST') {
+    const b = await request.json();
+    const id = await createVariant(env.DB, { actor, ...b });
+    return json({ id });
+  }
   if (path.startsWith('variants/') && method === 'GET') {
     const productId = path.split('/')[1];
     return json(await listVariants(env.DB, productId));
@@ -90,6 +102,11 @@ async function routeAdmin(request, env, ctx, actor) {
     const id = path.split('/')[1];
     const fields = await request.json();
     await updateVariant(env.DB, { actor, id, fields });
+    return json({ ok: true });
+  }
+  if (path.startsWith('variants/') && path.endsWith('/delete') && method === 'POST') {
+    const id = path.split('/')[1];
+    await softDeleteVariant(env.DB, { actor, id });
     return json({ ok: true });
   }
   if (path === 'variants/bulk-availability' && method === 'POST') {
@@ -107,9 +124,20 @@ async function routeAdmin(request, env, ctx, actor) {
     const id = await createCut(env.DB, { actor, ...b });
     return json({ id });
   }
+  if (path.startsWith('cuts/') && method === 'PUT') {
+    const id = path.split('/')[1];
+    const fields = await request.json();
+    await updateCut(env.DB, { actor, id, fields });
+    return json({ ok: true });
+  }
   if (path.startsWith('cuts/') && path.endsWith('/hide') && method === 'POST') {
     const id = path.split('/')[1];
     await hideCut(env.DB, { actor, id });
+    return json({ ok: true });
+  }
+  if (path.startsWith('cuts/') && path.endsWith('/delete') && method === 'POST') {
+    const id = path.split('/')[1];
+    await softDeleteCut(env.DB, { actor, id });
     return json({ ok: true });
   }
   if (path === 'categories' && method === 'GET') {
@@ -120,9 +148,20 @@ async function routeAdmin(request, env, ctx, actor) {
     const id = await createCategory(env.DB, { actor, ...b });
     return json({ id });
   }
+  if (path.startsWith('categories/') && method === 'PUT') {
+    const id = path.split('/')[1];
+    const fields = await request.json();
+    await updateCategory(env.DB, { actor, id, fields });
+    return json({ ok: true });
+  }
   if (path.startsWith('categories/') && path.endsWith('/hide') && method === 'POST') {
     const id = path.split('/')[1];
     await hideCategory(env.DB, { actor, id });
+    return json({ ok: true });
+  }
+  if (path.startsWith('categories/') && path.endsWith('/delete') && method === 'POST') {
+    const id = path.split('/')[1];
+    await softDeleteCategory(env.DB, { actor, id });
     return json({ ok: true });
   }
 

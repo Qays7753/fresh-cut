@@ -450,6 +450,96 @@ export async function hideCategory(db, { actor, id }) {
   await audit(db, { actor, table: 'categories', recordId: id, action: 'hide', diff: {} });
 }
 
+// Full edit for a category (name, visibility, sort, image link).
+export async function updateCategory(db, { actor, id, fields }) {
+  const now = nowIso();
+  const allowed = ['name_ar','name_en','visible','sort_order','image_id'];
+  const sets = [];
+  const vals = [];
+  for (const k of allowed) {
+    if (k in fields) { sets.push(`${k} = ?`); vals.push(bind(fields[k])); }
+  }
+  if (!sets.length) return;
+  sets.push(`updated_at = ?`);
+  vals.push(now, id);
+  await db.prepare(`UPDATE categories SET ${sets.join(', ')} WHERE id = ? AND deleted_at IS NULL`)
+    .bind(...vals).run();
+  await audit(db, { actor, table: 'categories', recordId: id, action: 'update', diff: fields });
+}
+
+// Full edit for a cut (name, visibility, sort).
+export async function updateCut(db, { actor, id, fields }) {
+  const now = nowIso();
+  const allowed = ['name_ar','name_en','visible','sort_order'];
+  const sets = [];
+  const vals = [];
+  for (const k of allowed) {
+    if (k in fields) { sets.push(`${k} = ?`); vals.push(bind(fields[k])); }
+  }
+  if (!sets.length) return;
+  sets.push(`updated_at = ?`);
+  vals.push(now, id);
+  await db.prepare(`UPDATE cuts SET ${sets.join(', ')} WHERE id = ? AND deleted_at IS NULL`)
+    .bind(...vals).run();
+  await audit(db, { actor, table: 'cuts', recordId: id, action: 'update', diff: fields });
+}
+
+// Soft-delete a product (sets deleted_at). Never a hard DELETE.
+// Linked variants are NOT auto-deleted — they just stop appearing
+// because every variant query filters on the product's deleted_at
+// via the join. We soft-delete them too for cleanliness.
+export async function softDeleteProduct(db, { actor, id }) {
+  const now = nowIso();
+  await db.prepare(
+    `UPDATE products SET deleted_at = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL`
+  ).bind(now, now, id).run();
+  await db.prepare(
+    `UPDATE variants SET deleted_at = ?, updated_at = ? WHERE product_id = ? AND deleted_at IS NULL`
+  ).bind(now, now, id).run();
+  await audit(db, { actor, table: 'products', recordId: id, action: 'soft_delete', diff: {} });
+}
+
+export async function softDeleteCategory(db, { actor, id }) {
+  const now = nowIso();
+  await db.prepare(
+    `UPDATE categories SET deleted_at = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL`
+  ).bind(now, now, id).run();
+  await audit(db, { actor, table: 'categories', recordId: id, action: 'soft_delete', diff: {} });
+}
+
+export async function softDeleteCut(db, { actor, id }) {
+  const now = nowIso();
+  await db.prepare(
+    `UPDATE cuts SET deleted_at = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL`
+  ).bind(now, now, id).run();
+  await audit(db, { actor, table: 'cuts', recordId: id, action: 'soft_delete', diff: {} });
+}
+
+export async function softDeleteVariant(db, { actor, id }) {
+  const now = nowIso();
+  await db.prepare(
+    `UPDATE variants SET deleted_at = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL`
+  ).bind(now, now, id).run();
+  await audit(db, { actor, table: 'variants', recordId: id, action: 'soft_delete', diff: {} });
+}
+
+// Create a new variant on an existing product (used by the product
+// editor's "add pack size" button).
+export async function createVariant(db, { actor, productId, cutId, packSize, price, minOrder, availability, availabilityNoteAr }) {
+  const id = makeId('var');
+  const now = nowIso();
+  await db.prepare(
+    `INSERT INTO variants (id, product_id, cut_id, pack_size, price, min_order,
+       availability, availability_note_ar, visible, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`
+  ).bind(id, productId, cutId, packSize || '1kg',
+    price || null, minOrder || null,
+    availability || 'available', availabilityNoteAr || null, now, now).run();
+  await audit(db, { actor, table: 'variants', recordId: id, action: 'create',
+    diff: { productId, cutId, packSize } });
+  return id;
+}
+
 // ---- private links -----------------------------------------
 
 export async function createPrivateLink(db, { actor, productIds, note, expiresAt }) {

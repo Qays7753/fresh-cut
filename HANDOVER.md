@@ -1,194 +1,322 @@
 # ألياف الشمال — دليل التشغيل والتسليم (Handover / Ops)
 
-> توثيق صادق وكامل للحالة الفعلية. اقرأه بالكامل قبل أي عمل.
-> آخر تحديث: 2026-07-23.
+> ملف توثيق لكل تفاصيل النشر المهمة. اقرأه قبل أي تعديل، وسلّمه لأي شخص يستلم المشروع.
+> آخر تحديث: 2026-07-22.
 
 ---
 
-## 0. ملخّص صادق بجملة واحدة
+## 1. الحالة الحالية (Status)
 
-**الموقع العام (للزباين) شغّال تماماً؛ لكن لوحة التحكم (الأدمن) غير جاهزة للاستخدام حالياً** —
-لسببين: (1) لا توجد آلية دخول فعّالة، و(2) migration `0004` لم يُطبَّق على القاعدة الحيّة فتفشل
-استعلامات المنتجات. التفاصيل في §1 و§2.
-
----
-
-## 1. الحالة الفعلية (Status) — بصدق
-
-| المكوّن | الحالة الحقيقية |
+| المكوّن | الحالة |
 |---|---|
-| الموقع العام `alyaf-alshamal.pages.dev` | ✅ شغّال — hero + 16 صنف بصورهم + شبكة الفئات + قسم الشركة |
-| فورم الطلبات → D1 → واتساب | ✅ شغّال ومختبَر (رقم مرجع AS-2607-…) |
-| قاعدة D1 | ⚠️ migrations 0001,0002,0003,**0005** مطبّقة. **0004 غير مطبّق** (انظر §2) |
-| الـWorker (API) | ✅ منشور (آخر نشر تلقائي نجح). **لكن استعلامات المنتجات تفشل بسبب نقص 0004** |
-| لوحة التحكم `alyaf-alshamal-admin.pages.dev` | ❌ **غير قابلة للاستخدام الآن**: لا دخول فعّال + استعلامات مكسورة |
-| ربط `/api/*` بالموقعين | ✅ عبر `_worker.js` + Service Binding `API` |
-| النشر التلقائي (GitHub Actions) | ✅ يعمل على كل push إلى `main` (بعد ضبط سرّ `CLOUDFLARE_API_TOKEN`) |
-| حماية الأدمن (Cloudflare Access) | ❌ **لم تُفعَّل، والقرار: استبدالها بتسجيل دخول داخلي بكلمة سر (لم يُبنَ بعد)** |
-| مكتبة الصور R2 | ⚠️ الكود موجود، لكن **الـbucket غير منشأ والـbinding معلّق** — الرفع لا يعمل |
-| سرّ الإيميل (Resend) | ⏳ غير مضبوط (الإيميل يصمت بأمان) |
-| تحديث الموقع العام بعد تعديل اللوحة | ❌ **غير موصول** (انظر §9 — فجوة مهمة) |
+| قاعدة البيانات D1 | ✅ منشورة + الجداول مبنية + البيانات النائبة محمّلة |
+| الـWorker (API) | ✅ منشور وشغّال |
+| الموقع العام | ✅ منشور وشغّال — **الفورم يحفظ الطلبات بنجاح** |
+| لوحة التحكم (dashboard) | ✅ منشورة + **محميّة بكلمة سر داخلية** (راجع §7) |
+| ربط `/api/*` بالموقعين | ✅ شغّال عبر `_worker.js` + Service Binding |
+| سرّ الإيميل (Resend) | ⏳ لم يُضبط بعد (الإيميل معطّل بأمان لحين ضبطه) |
+| Deploy hook (تحديث تلقائي) | ⏳ لم يُضبط بعد |
+| استبدال المحتوى النائب + الصور | ⏳ لم يبدأ |
+| **إدارة الصور عبر R2** | ⏳ الكود جاهز، يحتاج: إنشاء bucket + تفعيل binding + تشغيل migration (راجع §11) |
+
+### المتبقّي (Do next)
+1. **ضبط كلمة سر الدخول**: أنشئ `ADMIN_PASSWORD_HASH` و `SESSION_SECRET` (راجع §7).
+2. ضبط الأسرار الاختيارية: `RESEND_API_KEY`، `PUBLIC_DEPLOY_HOOK_URL` (راجع §5).
+3. تنظيف بيانات الفحص من D1 (راجع §8).
+4. استبدال الأصناف والنصوص النائبة `[[...]]` من لوحة التحكم، ورفع الصور الحقيقية عبر مكتبة الصور.
 
 ---
 
-## 2. المشكلة الحرجة الحالية: migration 0004 غير مطبّق
-
-- سجل workflow "Run D1 migration" يُظهر تشغيلاً **واحداً فقط** = `0005_images.sql`.
-  أي أن `0004_catalog_real.sql` **لم يُشغَّل على القاعدة الحيّة**.
-- نتيجة ذلك في القاعدة الحيّة: جدول `products` فيه **12 صنف نائب** (لا 16)، **بلا عمود `image`**،
-  لكن **مع عمود `image_id`** (من 0005).
-- استعلامات الـWorker (`getCatalogForPublic`, `listProducts` في `queries.js`) تختار
-  `p.image, p.image_id` معاً → العمود `image` غير موجود → **الاستعلام يفشل** →
-  `/api/catalog` ولوحة المنتجات تعطي خطأ.
-- **الموقع العام لا يتأثر** لأنه static (مطبوع من `generateFromSqlSeed` = 16 صنف بمسارات ثابتة).
-- **الإصلاح**: شغّل `0004` عبر workflow (§7)، مدخلاً `0004_catalog_real.sql`. آمن: يضيف عمود
-  `image`، يستبدل الـ12 النائبة بالـ16 الحقيقية (بيانات seed فقط؛ لا يمسّ الطلبات/الزباين).
-  الترتيب 0005-ثم-0004 سليم (يلمسان أعمدة مختلفة).
-
----
-
-## 3. المعمارية (Architecture)
+## 2. المعمارية (Architecture)
 
 ```
-  الزبون ──▶ alyaf-alshamal.pages.dev  (static + public/_worker.js)
-                    │ Service Binding "API"  (public يحجب /api/admin/*)
-                    ▼
-            alyaf-alshamal-api (Worker, workers_dev=false) ──▶ D1: alyaf-alshamal
-                    ▲                                          └▶ R2: IMAGES (معلّق حالياً)
-                    │ Service Binding "API"
-  المالك ──▶ alyaf-alshamal-admin.pages.dev  (static + dashboard/_worker.js يمرّر كل /api/*)
+                         ┌───────────────────────────┐
+   الزبون (متصفح) ───────▶│  alyaf-alshamal.pages.dev  │  (الموقع العام - static + _worker.js)
+                         │   _worker.js يوجّه /api/*  │
+                         └─────────────┬─────────────┘
+                                       │ Service Binding (API)
+                                       ▼
+                         ┌───────────────────────────┐        ┌──────────────┐
+                         │   alyaf-alshamal-api       │───────▶│  D1 database │
+                         │   (Worker, لا رابط عام)     │        │ alyaf-alshamal│
+                         └─────────────▲─────────────┘        └──────────────┘
+                                       │ Service Binding (API)
+   المالك (بعد Access) ───────────────┐│
+                         ┌────────────┴┴────────────────┐
+                         │ alyaf-alshamal-admin.pages.dev│ (لوحة التحكم - محميّة بـAccess)
+                         │  _worker.js يوجّه /api/*      │
+                         └───────────────────────────────┘
 ```
 
-- الموقعان static؛ كل واحد فيه `_worker.js` بجذره يوجّه `/api/*` للـWorker عبر Service Binding
-  `API`، ويخدم الباقي عبر `env.ASSETS`.
-- الـWorker مقفول عن الإنترنت (`workers_dev=false`) — يُوصَل له **فقط** عبر الـbindings.
-- `public/_worker.js` **يحجب** `/api/admin/*`. `dashboard/_worker.js` يمرّر كل `/api/*`.
-- خدمة الصور العامة `GET /api/images/<id>` (غير admin) تمرّ عبر الموقع العام أيضاً.
+- الموقعان **static** (ملفات جاهزة). كل موقع فيه `_worker.js` بجذره يوجّه `/api/*` للـWorker عبر **Service Binding** اسمه `API`، ويخدم باقي الملفات عبر `env.ASSETS`.
+- الـWorker **مقفول عن الإنترنت** (`workers_dev = false`) — يُوصَل له **فقط** عبر الـbindings. هذا يمنع أي وصول مباشر لأوامر الإدارة.
+- الموقع العام **يحجب** `/api/admin/*` (غير مصرّح). لوحة التحكم تمرّر `/api/admin/*` لأنها خلف Cloudflare Access.
+- الكاتالوج مطبوع في HTML وقت البناء (لا استعلامات قاعدة بيانات من المتصفح). الفورم يرسل `POST /api/leads`.
 
 ---
 
-## 4. الروابط والمعرّفات (ليست أسراراً)
+## 3. الروابط والمعرّفات (URLs & IDs)
 
 | العنصر | القيمة |
 |---|---|
-| Repo | `Qays7753/fresh-cut` (public) — الفرع `main` |
+| Repo | `Qays7753/fresh-cut` — الفرع الأساسي `main` |
 | Cloudflare Account ID | `663413a9a3389b95eb5d970c6a7ef9d5` |
-| D1 name / id | `alyaf-alshamal` / `4f5e819a-6049-4c1a-afd8-a22c4d4d0396` |
-| Worker | `alyaf-alshamal-api` (بلا رابط عام) |
-| Public Pages | `alyaf-alshamal` → https://alyaf-alshamal.pages.dev |
-| Admin Pages | `alyaf-alshamal-admin` → https://alyaf-alshamal-admin.pages.dev |
-| Service Binding (كلا مشروعي Pages) | `API` → `alyaf-alshamal-api` |
-| إيميل إشعارات الطلبات (seed) | `businesses.access.25@gmail.com` |
-| R2 bucket (مخطّط، غير منشأ) | `alyaf-alshamal-images` |
+| D1 database name | `alyaf-alshamal` |
+| D1 database_id | `4f5e819a-6049-4c1a-afd8-a22c4d4d0396` (مثبّت في `worker/wrangler.toml`) |
+| Worker | `alyaf-alshamal-api` (بلا رابط عام — `workers_dev=false`) |
+| Public Pages project | `alyaf-alshamal` → https://alyaf-alshamal.pages.dev |
+| Admin Pages project | `alyaf-alshamal-admin` → https://alyaf-alshamal-admin.pages.dev |
+| Service Binding (على كلا مشروعي Pages) | Variable name: `API` → Service: `alyaf-alshamal-api` |
+| إيميل إشعارات الطلبات (في البيانات النائبة) | `businesses.access.25@gmail.com` — يُعدّل من صفحة الإعدادات |
 
-> الأسرار (توكنات/كلمات سر) لا تُوضع هنا إطلاقاً.
+> ملاحظة: `Account ID` و `database_id` معرّفات تشغيلية (ليست أسراراً) وموجودة أصلاً في المستودع. **مفاتيح الـAPI والأسرار لا تُوضع هنا أبداً.**
 
 ---
 
-## 5. بنية المستودع
+## 4. بنية المستودع (Repo layout)
 
 ```
-public/    _worker.js (يوجّه /api/*، يحجب /api/admin/*) + index.html, ar/index.html (مولّد),
-           js/site.js, css/{tokens,site}.css, img/*.webp, api/catalog.json
-dashboard/ _worker.js (يمرّر /api/*) + index.html, js/dashboard.js, css/dashboard.css
-worker/    wrangler.toml (D1 DB, R2 IMAGES معلّق, workers_dev=false, ADMIN_ORIGIN)
-           src/index.js (توجيه: /api/catalog, /api/leads, /api/images/<id>, /api/admin/*)
-           src/queries.js (كل استعلامات D1 + audit()) · src/handlers/admin.js · src/email.js
-migrations/ 0001_init · 0002_seed · 0003_kv_shim · 0004_catalog_real · 0005_images
-build/     build-public.js (يولّد public/ar/index.html من generateFromSqlSeed أو D1) + templates/
-.github/workflows/ deploy.yml (نشر تلقائي على push) · migrate.yml (تشغيل migration يدوي)
+public/            # الموقع العام (static)
+  _worker.js       # يوجّه /api/* للـWorker، يحجب /api/admin/*، ويخدم static
+  index.html, js/site.js, css/, img/, ar/, api/catalog.json
+dashboard/         # لوحة التحكم (static)
+  _worker.js       # يمرّر /api/* للـWorker (خلف Access)
+  index.html, js/dashboard.js, css/
+worker/            # الـWorker (API)
+  wrangler.toml    # فيه database_id + workers_dev=false + ADMIN_ORIGIN
+  src/index.js     # نقطة الدخول: /api/catalog, /api/leads, /api/admin/*
+  src/queries.js   # كل استعلامات D1
+  src/handlers/admin.js  # موجّه /api/admin/* + يستدعي deploy hook بعد التعديلات
+  src/email.js     # إشعار الإيميل عبر Resend (يصمت بأمان بلا مفتاح)
+migrations/        # 0001_init (الجداول), 0002_seed (نائب), 0003_kv_shim
 ```
 
 ---
 
-## 6. النشر (تلقائي عبر GitHub Actions)
+## 5. الأسرار المطلوبة (Secrets) — تُضبط من لوحة Cloudflare
 
-- أي `push` إلى `main` → workflow `deploy.yml` ينشر: الـWorker + الموقع العام + لوحة التحكم.
-- يتطلب سرّ مستودع واحد: **`CLOUDFLARE_API_TOKEN`** (مضبوط) بصلاحيات:
-  Workers Scripts:Edit · Cloudflare Pages:Edit · D1:Edit · Account Settings:Read.
-- Account ID مضمّن في ملفّي الـworkflow.
-- ⚠️ **`deploy.yml` ينشر ملفات `public/` المُلتزَمة كما هي — لا يشغّل البناء** (انظر §9).
+على مشروع الـWorker `alyaf-alshamal-api`: **Settings → Variables and Secrets → Add (Secret)**
+أو من الـCLI: `npx wrangler secret put <NAME>` من مجلد `worker`.
 
----
-
-## 7. تشغيل migrations (بضغطة زر، بدون Codespace)
-
-Actions → **Run D1 migration** → Run workflow → أدخِل اسم الملف (مثلاً `0004_catalog_real.sql`)
-→ Run. يشغّل `wrangler d1 execute alyaf-alshamal --remote --file=migrations/<الملف>`.
-
-**المطبّق فعلاً:** 0001, 0002, 0003 (عبر Codespace مبكراً)، 0005 (عبر الـworkflow).
-**غير مطبّق:** **0004** (يجب تشغيله — §2).
-
----
-
-## 8. الأسرار (تُضبط على الـWorker: Settings → Variables and Secrets، أو `wrangler secret put`)
-
-| السرّ | الغرض | الحالة |
+| السرّ | لماذا | إلزامي؟ |
 |---|---|---|
-| `RESEND_API_KEY` | إشعار إيميل للطلبات (resend.com) | غير مضبوط (اختياري) |
-| `PUBLIC_DEPLOY_HOOK_URL` | إعادة بناء الموقع بعد تعديل | غير مضبوط (وغير كافٍ وحده — §9) |
-| `MAIL_FROM` | مُرسِل Resend بعد توثيق دومين | غير مضبوط |
-| (قادم) `ADMIN_PASSWORD_HASH`, `SESSION_SECRET` | لتسجيل الدخول الداخلي | عند بناء الميزة |
+| `ADMIN_PASSWORD_HASH` | كلمة سر دخول لوحة التحكم (base64(SHA-256)). راجع §7 لطريقة التوليد. | **نعم** — بدونه لا يمكن الدخول للوحة |
+| `SESSION_SECRET` | مفتاح توقيع توكنات الجلسة (HMAC-SHA256). 32+ بايت عشوائي. | **نعم** — بدونه يفشل تسجيل الدخول |
+| `RESEND_API_KEY` | إشعار إيميل عند كل طلب جديد (عبر resend.com) | اختياري — بدونه الإيميل يصمت، والفورم والطلبات تعمل عادي |
+| `PUBLIC_DEPLOY_HOOK_URL` | يعيد بناء الموقع العام تلقائياً بعد تعديل الأصناف/الإعدادات | اختياري |
+| `MAIL_FROM` | عنوان المُرسِل بعد توثيق دومين في Resend | اختياري (الافتراضي سندبوكس Resend) |
+
+> ⚠️ عنوان مُرسِل Resend الافتراضي (`onboarding@resend.dev`) يصل فقط لإيميل صاحب حساب Resend. لإرسال لأي عنوان، وثّق دوميناً في Resend واضبط `MAIL_FROM`.
 
 ---
 
-## 9. فجوة مهمة: تعديلات اللوحة لا تظهر على الموقع العام تلقائياً
+## 6. كيف تنشر تعديلات (Deploy)
 
-- الموقع العام static ومطبوع وقت البناء. `deploy.yml` ينشر `public/ar/index.html` المُلتزَم
-  **كما هو، دون تشغيل `npm run build`**.
-- حتى لو شُغِّل البناء، `build-public.js` بلا متغيرات بيئة يستخدم `generateFromSqlSeed()`
-  (16 صنف ثابتة) **لا القاعدة الحيّة**. لجلب تعديلات D1 يلزم تشغيل البناء بمتغيرات
-  `D1_DATABASE_ID` + `CF_API_TOKEN` + `CF_ACCOUNT_ID` (المسار `build:live`).
-- **النتيجة الصادقة:** لو عدّل المالك صنفاً/سعراً/نصاً من اللوحة (يُكتب في D1)، **لن يظهر على
-  الموقع العام** بالوضع الحالي. حلقة «عدّل في اللوحة → يظهر على الموقع» **غير موصولة**.
-- الحل المطلوب مستقبلاً: إما بناء بمتغيرات D1 في CI مع deploy hook، أو جعل الموقع يقرأ
-  الكاتالوج وقت التشغيل من `/api/catalog` عبر البروكسي.
+النشر حالياً **يدوي من Codespace** (أو أي جهاز فيه Node). خطوات لمرة واحدة:
 
----
+1. افتح Codespace من المستودع (زر `Code` → Codespaces)، أو استخدم جهازك.
+2. اضبط مصادقة Cloudflare عبر **API token** (لأن `wrangler login` OAuth لا يعمل داخل Codespaces):
+   ```bash
+   export CLOUDFLARE_API_TOKEN=<token>
+   export CLOUDFLARE_ACCOUNT_ID=663413a9a3389b95eb5d970c6a7ef9d5
+   ```
+   **صلاحيات التوكن المطلوبة** (Custom Token على dash.cloudflare.com/profile/api-tokens):
+   - Account → **Workers Scripts** → Edit
+   - Account → **Cloudflare Pages** → Edit
+   - Account → **D1** → Edit
+   - Account → **Account Settings** → Read
+3. النشر:
+   ```bash
+   # الـWorker
+   cd worker && npx wrangler deploy && cd ..
+   # الموقع العام (يجب أن يظهر "Compiled Worker successfully")
+   npx wrangler pages deploy public    --project-name=alyaf-alshamal       --commit-dirty=true
+   # لوحة التحكم
+   npx wrangler pages deploy dashboard --project-name=alyaf-alshamal-admin --commit-dirty=true
+   ```
 
-## 10. حالة تسجيل الدخول / الأمان (قرار متّخذ، غير منفّذ)
+> 💡 مستقبلاً يمكن التحويل لنشر تلقائي عبر ربط GitHub، لكنه يحتاج ضبطاً دقيقاً لإعدادات البناء مع `_worker.js`. النشر اليدوي أعلاه موثوق ويكفي.
 
-- Cloudflare Access **لم يُفعَّل**. الـWorker حالياً يتحقق من وجود ترويسة
-  `Cf-Access-Jwt-Assertion` في `/api/admin/*`؛ وبما أن لا Access يحقنها، **كل طلبات الأدمن
-  تُرجع 401** → اللوحة لا تحمّل بيانات.
-- **القرار النهائي للمالك:** إلغاء Access واستبداله بـ**تسجيل دخول داخلي بكلمة سر** (خوفاً من
-  طلب بطاقة عند تفعيل Zero Trust). هذه الميزة **لم تُبنَ بعد** — وهي المهمة الكبيرة القادمة
-  (تشمل: نقطة `/api/admin/login`، session token موقّع، شاشة دخول باللوحة، وأسرار
-  `ADMIN_PASSWORD_HASH` + `SESSION_SECRET`).
-- مع إلغاء Access، **يجب تغيير تحقق الـWorker** من "وجود الترويسة" إلى "التحقق من session token"،
-  وإلا يبقى الأدمن مكسوراً/غير آمن.
-
----
-
-## 11. مكتبة الصور (R2) — الكود جاهز، البنية غير مفعّلة
-
-- الكود (من commit `2a7a360`): جدول `images` (حذف منطقي)، أعمدة `image_id` على products/categories،
-  رفع `POST /api/admin/images` (multipart → R2 + D1)، خدمة عامة `GET /api/images/<id>`، وقسم
-  "الصور" في اللوحة (شبكة، رفع بمعاينة، تعديل، إخفاء، حذف منطقي، ربط بمنتج/فئة).
-- **غير مفعّل:** الـR2 bucket `alyaf-alshamal-images` **غير منشأ**، والـbinding `[[r2_buckets]]`
-  في `wrangler.toml` **معلّق**. الرفع يُرجع خطأ آمن، والخدمة العامة تُرجع 404 حتى التفعيل.
-- التفعيل (لمرة واحدة): أنشئ الـbucket → أزل التعليق عن الـbinding → أعد النشر (push).
-- الأصناف الـ16 الحالية تستخدم مسارات ثابتة `/img/<slug>.webp` (image_id فارغ) حتى تُربط بصور R2.
+### تشغيل migrations جديدة (نادراً)
+```bash
+cd worker
+npx wrangler d1 execute alyaf-alshamal --remote --file=../migrations/XXXX.sql
+```
 
 ---
 
-## 12. المهمة الكبيرة القادمة (مخطّطة)
+## 7. حماية لوحة التحكم — تسجيل دخول داخلي بكلمة سر
 
-بناء (عبر وكيل خارجي على `main`): **تسجيل دخول داخلي بكلمة سر** (يستبدل Access) +
-**تحكم CMS كامل**: تحرير الأسعار (`variants.price`, `min_order`)، كشف كل النصوص/العناوين،
-**منتقي صور (media picker)** داخل محرّر المنتج/الفئة/الهيرو، **رفع بالدفعة** (حتى ~50 صورة)،
-مع التقيّد بالهوية البصرية (`alyaf-alshamal-reference-FINAL.md` + tokens)، والحذف المنطقي،
-وaudit، وأفضل ممارسات UX/أداء/إتاحة.
+> **تغيير مهم:** ألغينا الاعتماد على Cloudflare Access. الحماية الآن عبر **كلمة سر داخلية** يتحقق منها الـWorker. هذا أبسط للمالك (لا حاجة لإعداد Zero Trust) ويُعطي تحكماً كاملاً في الجلسة.
+
+### كيف تعمل
+
+- المالك يضبط سرّين على الـWorker: `ADMIN_PASSWORD_HASH` (hash كلمة السر) و `SESSION_SECRET` (مفتاح توقيع الجلسة).
+- عند فتح اللوحة، تظهر شاشة دخول تطابق هوية الموقع. يكتب المالك كلمة السر.
+- `POST /api/admin/login` يتحقق منها constant-time، ثم يصدر **توكن جلسة موقّع** (HMAC-SHA256) بصلاحية 12 ساعة، يُحفظ كـ**httpOnly cookie**.
+- كل طلب `/api/admin/*` (عدا `/login` و `/logout`) يتطلب توكن صالح. عند الغياب/البطلان: 401، واللوحة تعيد شاشة الدخول.
+- الـWorker مقفول عن الإنترنت (`workers_dev=false`)؛ الموقع العام يحجب `/api/admin/*`. لوحة التحكم تمرّر `/api/*` عبر Service Binding. فالطريق الوحيد لأوامر الإدارة هو عبر لوحة التحكم بعد تسجيل الدخول.
+
+### الإعداد لمرة واحدة
+
+1. **ولّد hash كلمة السر** (استبدل `YOUR_PASSWORD` بكلمة السر الفعلية):
+   ```bash
+   node -e "const c=require('crypto');console.log(c.createHash('sha256').update(process.argv[1]).digest('base64'))" 'YOUR_PASSWORD'
+   ```
+   انسخ الناتج (سلسلة base64 طويلة).
+
+2. **ولّد مفتاح الجلسة** (32 بايت عشوائي):
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+   ```
+
+3. **اضبط السرّين على الـWorker** (من مجلد `worker`):
+   ```bash
+   cd worker
+   npx wrangler secret put ADMIN_PASSWORD_HASH
+   # الصق hash كلمة السر من الخطوة 1
+   npx wrangler secret put SESSION_SECRET
+   # الصق مفتاح الجلسة من الخطوة 2
+   ```
+
+4. **أعد نشر الـWorker** (أو ادفع على `main` — GitHub Actions سينشر تلقائياً):
+   ```bash
+   cd worker && npx wrangler deploy
+   ```
+
+5. **اختبر:** افتح `https://alyaf-alshamal-admin.pages.dev/` → يجب أن تظهر شاشة الدخول. اكتب كلمة السر → تدخل اللوحة. زر «خروج» في الأعلى ينهي الجلسة.
+
+### تغيير كلمة السر
+
+1. ولّد hash جديد لنفس الخطوة 1 أعلاه.
+2. `npx wrangler secret put ADMIN_PASSWORD_HASH` والصق القيمة الجديدة.
+3. الجلسات الحالية تبقى صالحة حتى تنتهي (12 ساعة) أو حتى يسجّل المستخدم خروجاً.
+
+### خصائص الأمان
+
+- **constant-time compare** على hash كلمة السر (دالة XOR-loop على 32 بايت).
+- **HMAC-SHA256** للتوكن — لا يُزوّر بدون `SESSION_SECRET`.
+- **انتهاء صلاحية** 12 ساعة (`exp` claim).
+- **httpOnly cookie** — JS لا يستطيع قراءتها (حماية من XSS).
+- **rate-limit** على `/login`: 10 محاولات/ساعة/IP (يحبط brute force).
+- **لا تسريب** لكلمة السر في الـlogs أو localStorage.
+- **public/_worker.js** ما زال يحجب `/api/admin/*` من الموقع العام — حتى لو تسرّب cookie (مستحيل عبر httpOnly)، لا يصل من الموقع العام.
 
 ---
 
-## 13. قائمة تسليم لوكيل/شخص جديد
+## 8. تنظيف بيانات الفحص (Cleanup)
 
-- [ ] اقرأ هذا الملف بالكامل، وابدأ من آخر `main` (`git pull`).
-- [ ] **أولاً أصلِح §2**: شغّل migration `0004` عبر الـworkflow، وتحقّق أن جدول products صار 16 صفاً
-      وفيه العمودان `image` و`image_id`.
-- [ ] الأمان: نفّذ تسجيل الدخول الداخلي (§10) — بدونه اللوحة غير قابلة للاستخدام.
-- [ ] لتفعيل رفع الصور: خطوة R2 (§11).
-- [ ] عالج فجوة الحلقة (§9) إن أردت أن تظهر تعديلات اللوحة على الموقع.
-- [ ] لا حذف فعلي (deleted_at فقط)، وكل تعديل عبر `audit()`، والتزم بالهوية البصرية.
-- [ ] كل تغيير على `main` ينشر تلقائياً على الموقع الحي — تحقّق من البناء قبل الدفع.
+خلال التشخيص أُنشئت بيانات فحص. نظّفها من **D1 → Console**:
+```sql
+DELETE FROM lead_events WHERE lead_id IN (SELECT id FROM leads WHERE source IN ('debug'));
+DELETE FROM leads WHERE source IN ('debug') OR ref='AS-2607-002';
+DELETE FROM contacts WHERE restaurant_id IN (SELECT id FROM restaurants WHERE name='__debug__');
+DELETE FROM restaurants WHERE name='__debug__';
+DELETE FROM audit_log WHERE actor='debug';
+```
+(عدّل `ref='AS-2607-002'` حسب أي طلبات تجريبية أرسلتها من الفورم.)
+
+---
+
+## 9. مطبّات مهمة تعلّمناها (Gotchas)
+
+1. **migrations لا تُشغَّل من D1 Console** — الـConsole ينفّذ جملة واحدة فقط. استخدم `wrangler d1 execute --remote --file=...`.
+2. **استخدم `_worker.js` لا مجلد `functions/`** — `wrangler pages deploy <dir>` لم يكتشف `<dir>/functions` ورفعه كملف static، فسقطت كل طلبات `/api/*` على الموقع الثابت. الحل: `_worker.js` بجذر مجلد النشر (تكتشفه Pages دائماً — يظهر `Compiled Worker successfully`).
+3. **Service Binding إلزامي** — الـWorker مقفول (`workers_dev=false`)، فبدون binding اسمه `API` على كل مشروع Pages تُرجع الدالة `502 api_binding_missing`. البايندنغ يُفعّل بعد أول نشر (أو أعد النشر).
+4. **صلاحيات التوكن** — توكن D1 وحده لا ينشر Workers/Pages. راجع §6.
+5. **لا تلصق أي token/secret في محادثات أو رسائل** — فقط في الترمينال/لوحة Cloudflare. إذا انكشف، اعمل Roll فوراً.
+
+---
+
+## 10. قائمة تسليم لشخص آخر (Handover checklist)
+
+- [ ] امنح الشخص وصولاً للمستودع `Qays7753/fresh-cut` وحساب Cloudflare (أو Account member).
+- [ ] عرّفه على هذا الملف (`HANDOVER.md`) و `README.md`.
+- [ ] سلّمه المعرّفات في §3 (ليست أسراراً).
+- [ ] هو ينشئ **API token خاص به** (§6) — لا تشارك توكنك.
+- [ ] شارك معه **كلمة سر لوحة التحكم** (أو ولّد واحدة جديدة بـ `wrangler secret put ADMIN_PASSWORD_HASH` — راجع §7).
+- [ ] راجع سوياً "المتبقّي" في §1.
+
+---
+
+## 11. إدارة الصور عبر R2 (Image Management)
+
+ميزة إدارة الصور الكاملة من لوحة التحكم: رفع، تحرير، إخفاء، حذف منطقي، وربط صورة بمنتج أو فئة. الصور تُخزَّن في **Cloudflare R2**، والمصفوفات في جدول `images` في D1.
+
+### المعمارية
+
+```
+لوحة التحكم ─── POST /api/admin/images (multipart) ──▶ Worker
+                                                          ├── env.IMAGES.put(r2Key, bytes)  → R2 bucket
+                                                          └── INSERT INTO images (...)      → D1
+
+الموقع العام ─── <img src="/api/images/<id>"> ──▶ Worker
+                                                    ├── SELECT * FROM images WHERE id=?
+                                                    └── env.IMAGES.get(r2_key)         → R2 bytes
+                                                       (Cache-Control: public, max-age=31536000, immutable)
+```
+
+- الـWorker يخدم الصور على `/api/images/<id>` (مسار عام، **ليس** تحت `/api/admin/*` الذي يحجبه `public/_worker.js`).
+- الصور تُخزَّن بـ`r2_key` فريد (`img_<timestamp>_<random>.<ext>`) — لا يتغيّر أبداً، لذا يُخزَّن مؤقتاً للأبد (`immutable`).
+- الحذف **منطقي** فقط: `UPDATE images SET deleted_at = ...`. لا يُحذف أي صف من D1، ولا يُحذف أي كائن من R2.
+- كل عملية كتابة تمرّ عبر `audit()` في `queries.js`.
+
+### الإعداد لمرة واحدة (إلزامي لتفعيل الرفع)
+
+> الميزة تتحمّل غياب R2 بأمان: الـWorker يُنشَر دون مشاكل، والقائمة/التحرير/الربط تعمل (D1 فقط)، والرفع يُرجع خطأ واضحاً حتى يُفعَّل R2.
+
+1. **أنشئ R2 bucket:**
+   ```bash
+   cd worker
+   npx wrangler r2 bucket create alyaf-alshamal-images
+   ```
+
+2. **فعّل الـbinding في `worker/wrangler.toml`:** أزل التعليق `#` عن هذا المقطع:
+   ```toml
+   [[r2_buckets]]
+   binding       = "IMAGES"
+   bucket_name   = "alyaf-alshamal-images"
+   ```
+
+3. **أعد نشر الـWorker:**
+   ```bash
+   cd worker && npx wrangler deploy
+   ```
+   (أو ادفع على `main` — GitHub Actions سينشر تلقائياً.)
+
+4. **شغّل migration الصور:**
+   ```bash
+   cd worker
+   npx wrangler d1 execute alyaf-alshamal --remote --file=../migrations/0005_images.sql
+   ```
+   هذا ينشئ جدول `images`، ويضيف عمود `image_id` على `products` و`categories`، ويضيف مفاتيح إعدادات اختيارية (`hero_image_id`, `why_image_id`, `sample_image_id`).
+
+5. **(اختياري) أضف binding الـR2 على مشروعي Pages أيضاً** إذا أردت خدمة الصور مباشرة من R2 عبر Pages مستقبلاً. حالياً خدمة الصور تمرّ عبر الـWorker فقط، فلا حاجة لذلك الآن.
+
+### الاستخدام من لوحة التحكم
+
+- افتح `https://alyaf-alshamal-admin.pages.dev/#images` (أو اضغط على أيقونة + من أي صفحة صور).
+- **رفع صورة:** اضغط زر + → اختر ملف → اقرأ المعاينة والأبعاد تلقائياً → اختر النوع (صنف/فئة/رئيسية/شركة) → اكتب نصاً بديلاً عربياً → (اختياري) اربط بمنتج أو فئة → اضغط «رفع».
+- **تحرير:** اضغط «تحرير» على أي صورة → عدّل النوع/النص البديل/الأبعاد → احفظ.
+- **ربط:** اضغط «ربط» → اختر منتجاً أو فئة → اضغط «ربط». (الربط يضبط `image_id` على المنتج/الفئة، ويفرغ `image` القديم للمنتج.)
+- **إخفاء/إظهار:** يضبط `visible=0/1`. الصورة المخفية لا تظهر على الموقع العام (الـendpoint يُرجع 404).
+- **حذف (منطقي):** يضبط `deleted_at`. الصورة تختفي من اللوحة لكنها تبقى في D1 و R2 للاسترجاع.
+- **فك الربط:** اضغط «ربط» ثم اختر «— بدون ربط —» (أو من تحرير المنتج/الفئة مباشرة).
+
+### كيف تظهر الصور على الموقع العام
+
+- **المنتجات:** إذا ضُبط `image_id`، يصدر الـbuild وسم `<img src="/api/images/<id>">`. إذا لم يكن مضبوطاً، يقع fallback على `image` (المسار الثابت مثل `/img/foo.webp`).
+- **الفئات:** نفس المنطق — `image_id` أولاً، ثم fallback على ملف `cat-*.webp` الثابت.
+- **Hero / Why / Sample:** حالياً تقرأ من مسارات ثابتة (`/img/hero.webp` إلخ). يمكن ربطها بصور R2 مستقبلاً عبر مفاتيح الإعدادات `hero_image_id` / `why_image_id` / `sample_image_id` (الـmigration 0005 أضافها).
+
+### مبادئ التصميم (لا تُكسر)
+
+1. **الحذف منطقي دائماً:** `UPDATE ... SET deleted_at = ...`. لا `DELETE` في أي مكان.
+2. **audit log لكل عملية:** كل كتابة على `images` أو `products.image_id` أو `categories.image_id` تمرّ عبر `audit()`.
+3. **الصور غير المرتبطة تبقى في المكتبة:** لا تُضاف منتجات لمطابقة الصور. الصورة تُرفع أولاً، ثم تُربط لاحقاً (أو تبقى غير مرتبطة).
+4. **أبعاد صريحة:** الرفع يقرأ `width/height` من المتصفح ويخزّنهما في D1. الـbuild يصدر `width="..." height="..."` صريحين (يمنع CLS).
+5. **lazy loading:** كل صورة تحت الطيّة `loading="lazy"` (عدا hero إذا رُبطت لاحقاً).
+6. **Caching:** `Cache-Control: public, max-age=31536000, immutable` — لأن `r2_key` فريد لكل رفع.
+7. **degrade safely:** غياب `env.IMAGES` لا يكسر النشر؛ الرفع يُرجع `{error:'r2_not_configured'}`، والـendpoint العام يُرجع 404.
+8. **المسار العام:** خدمة الصور على `/api/images/*` (ليس `/api/admin/*` الذي يحجبه `public/_worker.js`).
+9. **لا حذف من R2:** حتى لو حُذفت الصورة منطقياً من D1، الكائن يبقى في R2 (للاسترجاع). حذف R2 فعلي يتطلب إجراءً يدوياً منفصلاً.

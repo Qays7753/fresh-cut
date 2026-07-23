@@ -18,11 +18,18 @@ database_name = "alyaf-alshamal"
 database_id   = "4f5e819a-6049-4c1a-afd8-a22c4d4d0396"
 
 # Secrets (set with `wrangler secret put <NAME>`, never commit them):
-#   RESEND_API_KEY          — lead-notification email (Resend). Optional;
-#                             without it, email degrades to a silent no-op.
+#   ADMIN_PASSWORD_HASH      — base64(SHA-256(owner_password)). REQUIRED for
+#                              dashboard login. Generate with:
+#                                node -e "const c=require('crypto');console.log(c.createHash('sha256').update(process.argv[1]).digest('base64'))" 'your-password'
+#                              (see HANDOVER.md §7 for full steps)
+#   SESSION_SECRET           — 32+ random bytes (any string). REQUIRED for
+#                              signing session tokens. Generate with:
+#                                node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+#   RESEND_API_KEY           — lead-notification email (Resend). Optional;
+#                              without it, email degrades to a silent no-op.
 #   PUBLIC_DEPLOY_HOOK_URL   — Cloudflare Pages deploy hook. The worker POSTs
-#                             it after each catalog/settings edit to rebuild
-#                             the public site. Optional.
+#                              it after each catalog/settings edit to rebuild
+#                              the public site. Optional.
 #   MAIL_FROM (optional)     — verified Resend "from" address.
 # R2 bucket for image storage (image management feature).
 # ONE-TIME SETUP (see HANDOVER.md §11):
@@ -39,12 +46,7 @@ database_id   = "4f5e819a-6049-4c1a-afd8-a22c4d4d0396"
 [vars]
 ADMIN_ORIGIN = "https://alyaf-alshamal-admin.pages.dev"
 
-# Cloudflare Access protects /api/admin/* — see README §Cloudflare Access.
-# The worker verifies the Cf-Access-Jwt-Assertion header on every admin
-# request. Cloudflare Access itself does the actual JWT verification at
-# the edge before the request reaches the worker.
-
-# Deploy hook (called by the dashboard after settings/product edits to
-# trigger a rebuild of the public site):
-#   wrangler pages deploy-hook create alyaf-alshamal --project alyaf-alshamal
-# The dashboard worker calls this URL with a POST after each save.
+# Auth: internal password login (replaces Cloudflare Access). The worker
+# verifies an HMAC-SHA256 session token on every /api/admin/* request
+# (except /login and /logout). See HANDOVER.md §7 for setup.
+# public/_worker.js still hard-blocks /api/admin/* from the public origin.

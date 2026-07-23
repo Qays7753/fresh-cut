@@ -9,12 +9,42 @@
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
-<body class="admin-body" data-bar="true">
+<body class="admin-body" data-bar="true" data-authed="false">
+
+  <!-- Login overlay (shown until the user authenticates) -->
+  <div class="admin-login" data-authed="false" role="dialog" aria-modal="true" aria-label="تسجيل الدخول">
+    <div class="admin-login__card admin-card">
+      <div class="admin-login__brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v18M5 7c3 2 4 4 7 4s4-2 7-4M5 12c3 2 4 4 7 4s4-2 7-4M5 17c3 2 4 4 7 4s4-2 7-4"/>
+        </svg>
+        <span>ألياف الشمال</span>
+      </div>
+      <h1 class="admin-login__title">تسجيل الدخول إلى لوحة التحكم</h1>
+      <p class="admin-login__hint">أدخل كلمة المرور للمتابعة.</p>
+      <form class="admin-login__form" id="login-form" autocomplete="on">
+        <div class="admin-modal__row">
+          <label class="settings-row__label" for="login-password">كلمة المرور</label>
+          <input class="settings-row__input" id="login-password"
+                 type="password" name="password"
+                 autocomplete="current-password" dir="ltr"
+                 required minlength="6">
+        </div>
+        <p class="admin-login__error" data-login-error hidden></p>
+        <button class="btn btn--primary admin-login__submit" type="submit" data-login-submit>
+          دخول
+        </button>
+      </form>
+    </div>
+  </div>
 
   <header class="admin-header">
     <div class="admin-header__inner">
       <span class="admin-header__brand">ألياف الشمال — اللوحة</span>
-      <input type="search" class="admin-header__search" placeholder="بحث…" aria-label="بحث عام">
+      <div style="display:flex;align-items:center;gap:var(--space-3);flex:1;justify-content:flex-end">
+        <input type="search" class="admin-header__search" placeholder="بحث…" aria-label="بحث عام">
+        <button class="admin-header__logout" type="button" data-logout>خروج</button>
+      </div>
     </div>
   </header>
 
