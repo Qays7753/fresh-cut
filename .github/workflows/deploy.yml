@@ -1,0 +1,34 @@
+name: Deploy to Cloudflare
+
+# Auto-deploys on every push to main (and can be run manually from the
+# Actions tab). Deploys the API worker, the public site, and the dashboard.
+# Requires one repository secret: CLOUDFLARE_API_TOKEN (a token with
+# Workers Scripts:Edit, Cloudflare Pages:Edit, D1:Edit, Account Settings:Read).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 663413a9a3389b95eb5d970c6a7ef9d5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Deploy API worker
+        working-directory: worker
+        run: npx wrangler@4 deploy
+
+      - name: Deploy public site
+        run: npx wrangler@4 pages deploy public --project-name=alyaf-alshamal --branch=main
+
+      - name: Deploy dashboard
+        run: npx wrangler@4 pages deploy dashboard --project-name=alyaf-alshamal-admin --branch=main
