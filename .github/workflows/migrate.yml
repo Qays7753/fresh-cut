@@ -1,0 +1,27 @@
+name: Run D1 migration
+
+# Manually run a D1 migration against the live database from the Actions
+# tab — no Codespace/terminal needed. Uses the same CLOUDFLARE_API_TOKEN
+# secret as the deploy workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      file:
+        description: "Migration file under migrations/ (e.g. 0005_images.sql)"
+        required: true
+        default: "0005_images.sql"
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 663413a9a3389b95eb5d970c6a7ef9d5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Execute migration on remote D1
+        run: npx wrangler@4 d1 execute alyaf-alshamal --remote --file="migrations/${{ inputs.file }}"
