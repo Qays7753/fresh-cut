@@ -11,6 +11,8 @@ import {
   listCuts, listCategories, createCut, createCategory, hideCut, hideCategory,
   listRestaurants, getSettings, updateSetting,
   listPrivateLinks, createPrivateLink, exportTable,
+  createImage, listImages, getImage, updateImage, hideImage, softDeleteImage,
+  linkImageToProduct, linkImageToCategory, unlinkImage,
 } from '../queries.js';
 
 export async function handleAdmin(request, env, ctx, actor) {
@@ -29,7 +31,7 @@ export async function handleAdmin(request, env, ctx, actor) {
 
 // Routes whose changes are reflected on the public site.
 function affectsPublicSite(path) {
-  return /^(products|variants|cuts|categories|settings)(\/|$)/.test(path);
+  return /^(products|variants|cuts|categories|settings|images)(\/|$)/.test(path);
 }
 
 async function triggerRebuild(env) {
@@ -149,6 +151,56 @@ async function routeAdmin(request, env, ctx, actor) {
     return json(r);
   }
 
+  // ---- Images ----
+  // Upload is multipart/form-data: file (binary), type, alt_ar, width,
+  // height, and optionally product_id or category_id to link.
+  if (path === 'images' && method === 'POST') {
+    return await handleImageUpload(request, env, actor);
+  }
+  if (path === 'images' && method === 'GET') {
+    const type = url.searchParams.get('type') || undefined;
+    return json(await listImages(env.DB, { type }));
+  }
+  if (path.startsWith('images/') && method === 'GET') {
+    const id = path.split('/')[1];
+    const img = await getImage(env.DB, id);
+    if (!img) return json({ error: 'not_found' }, 404);
+    return json(img);
+  }
+  if (path.startsWith('images/') && method === 'PUT') {
+    const id = path.split('/')[1];
+    const fields = await request.json();
+    await updateImage(env.DB, { actor, id, fields });
+    return json({ ok: true });
+  }
+  if (path.startsWith('images/') && path.endsWith('/hide') && method === 'POST') {
+    const id = path.split('/')[1];
+    await hideImage(env.DB, { actor, id });
+    return json({ ok: true });
+  }
+  if (path.startsWith('images/') && path.endsWith('/delete') && method === 'POST') {
+    const id = path.split('/')[1];
+    await softDeleteImage(env.DB, { actor, id });
+    return json({ ok: true });
+  }
+  if (path.startsWith('images/') && path.endsWith('/unlink') && method === 'POST') {
+    const id = path.split('/')[1];
+    await unlinkImage(env.DB, { actor, imageId: id });
+    return json({ ok: true });
+  }
+  if (path.startsWith('images/') && path.endsWith('/link') && method === 'POST') {
+    const id = path.split('/')[1];
+    const b = await request.json();
+    if (b.productId) {
+      await linkImageToProduct(env.DB, { actor, imageId: id, productId: b.productId });
+    } else if (b.categoryId) {
+      await linkImageToCategory(env.DB, { actor, imageId: id, categoryId: b.categoryId });
+    } else {
+      return json({ error: 'missing_target' }, 400);
+    }
+    return json({ ok: true });
+  }
+
   // ---- Data view / CSV export ----
   if (path.startsWith('export/') && method === 'GET') {
     const table = path.split('/')[1];
@@ -182,4 +234,52 @@ function toCsv(rows) {
   const lines = [cols.join(',')];
   for (const r of rows) lines.push(cols.map(c => escape(r[c])).join(','));
   return lines.join('\n');
+}
+
+// ---- image upload (multipart → R2 + images row) -------------
+// Degrades safely if env.IMAGES (R2 binding) is absent: returns
+// a clear error so the dashboard can tell the owner to configure R2.
+async function handleImageUpload(request, env, actor) {
+  if (!env.IMAGES) {
+    return json({ error: 'r2_not_configured',
+      message: 'R2 binding غير مُفعّل. أنشئ الـbucket وفعّل الـbinding في wrangler.toml.' }, 400);
+  }
+
+  const form = await request.formData();
+  const file = form.get('file');
+  if (!file || typeof file === 'string') {
+    return json({ error: 'no_file' }, 400);
+  }
+
+  const type = form.get('type') || 'product';
+  const altAr = form.get('alt_ar') || '';
+  const width = form.get('width') ? parseInt(form.get('width'), 10) : null;
+  const height = form.get('height') ? parseInt(form.get('height'), 10) : null;
+  const productId = form.get('product_id') || null;
+  const categoryId = form.get('category_id') || null;
+
+  // Derive a stable r2_key: img_<timestamp>_<random>.<ext>
+  const ext = (file.name || '').split('.').pop() || 'webp';
+  const r2Key = `img_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+  const filename = file.name || r2Key;
+
+  // Read the file bytes and put to R2.
+  const bytes = await file.arrayBuffer();
+  await env.IMAGES.put(r2Key, bytes, {
+    httpMetadata: { contentType: file.type || 'image/webp' },
+  });
+
+  // Insert the images row.
+  const { id } = await createImage(env.DB, {
+    actor, filename, r2Key, type, altAr, width, height,
+  });
+
+  // Optionally link to a product or category.
+  if (productId) {
+    await linkImageToProduct(env.DB, { actor, imageId: id, productId });
+  } else if (categoryId) {
+    await linkImageToCategory(env.DB, { actor, imageId: id, categoryId });
+  }
+
+  return json({ ok: true, id, r2Key, filename });
 }

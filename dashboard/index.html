@@ -106,10 +106,21 @@
       </div>
     </section>
 
+    <!-- Images -->
+    <section class="admin-section" data-page="images">
+      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الصور</h1>
+      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
+        مكتبة الصور. ارفع، حرّر، أخفِ، احذف (حذف منطقي)، واربط صورة بمنتج أو فئة. الصور غير المرتبطة تبقى في المكتبة.
+      </p>
+      <div data-images>
+        <p class="admin-card">جارٍ التحميل…</p>
+      </div>
+    </section>
+
   </main>
 
-  <!-- Floating Add button (three-field quick add, §7) -->
-  <button class="admin-fab" aria-label="إضافة صنف جديد">
+  <!-- Floating Add button (three-field quick add on products; upload on images) -->
+  <button class="admin-fab" aria-label="إضافة عنصر جديد">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
       <line x1="12" y1="5" x2="12" y2="19"/>
       <line x1="5" y1="12" x2="19" y2="12"/>
@@ -157,13 +168,14 @@
     </a>
   </nav>
 
-  <!-- Hidden menu items reachable via hash — restaurants, cuts, categories, data, links -->
+  <!-- Hidden menu items reachable via hash — restaurants, cuts, categories, data, links, images -->
   <nav aria-hidden="true" style="display:none">
     <a data-nav="restaurants" href="#restaurants"></a>
     <a data-nav="cuts" href="#cuts"></a>
     <a data-nav="categories" href="#categories"></a>
     <a data-nav="data" href="#data"></a>
     <a data-nav="links" href="#links"></a>
+    <a data-nav="images" href="#images"></a>
   </nav>
 
   <script src="/js/dashboard.js" defer></script>

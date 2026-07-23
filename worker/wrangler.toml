@@ -24,6 +24,18 @@ database_id   = "4f5e819a-6049-4c1a-afd8-a22c4d4d0396"
 #                             it after each catalog/settings edit to rebuild
 #                             the public site. Optional.
 #   MAIL_FROM (optional)     — verified Resend "from" address.
+# R2 bucket for image storage (image management feature).
+# ONE-TIME SETUP (see HANDOVER.md §11):
+#   npx wrangler r2 bucket create alyaf-alshamal-images
+# Then UNCOMMENT the block below and redeploy the worker.
+# The worker degrades safely without this binding: image upload returns
+# a clear error, image list/edit/link still work (D1 only), and the
+# public /api/images/<id> endpoint returns 404.
+#
+# [[r2_buckets]]
+# binding       = "IMAGES"
+# bucket_name   = "alyaf-alshamal-images"
+
 [vars]
 ADMIN_ORIGIN = "https://alyaf-alshamal-admin.pages.dev"
 

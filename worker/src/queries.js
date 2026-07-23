@@ -102,13 +102,14 @@ export async function updateSetting(db, { actor, key, value }) {
 
 export async function getCatalogForPublic(db) {
   const cats = await db.prepare(
-    `SELECT id, name_ar, name_en FROM categories
+    `SELECT id, name_ar, name_en, image_id FROM categories
      WHERE visible = 1 AND deleted_at IS NULL
      ORDER BY sort_order`
   ).all();
 
   const products = await db.prepare(
     `SELECT p.id, p.slug, p.name_ar, p.name_en, p.summary_ar, p.category_id,
+            p.image, p.image_id,
             v.id AS variant_id, v.cut_id, v.pack_size,
             v.shelf_life_days, v.availability, v.availability_note_ar,
             c.name_ar AS cut_name_ar
@@ -297,6 +298,7 @@ export async function listRestaurants(db, { limit = 100, offset = 0 } = {}) {
 export async function listProducts(db) {
   const { results } = await db.prepare(
     `SELECT p.id, p.slug, p.name_ar, p.name_en, p.visible, p.sort_order,
+            p.image, p.image_id,
             c.name_ar AS category_name_ar,
             (SELECT COUNT(*) FROM variants v WHERE v.product_id = p.id AND v.deleted_at IS NULL) AS variant_count
      FROM products p
@@ -332,7 +334,8 @@ export async function createProduct(db, { actor, name, categoryId, cutId, slug }
 export async function updateProduct(db, { actor, id, fields }) {
   const now = nowIso();
   const allowed = ['name_ar','name_en','summary_ar','body_ar','visible','sort_order',
-                   'origin','season_months','usage_notes_ar','storage_temp','product_code','slug'];
+                   'origin','season_months','usage_notes_ar','storage_temp','product_code','slug',
+                   'image_id','image'];
   const sets = [];
   const vals = [];
   for (const k of allowed) {
@@ -401,7 +404,7 @@ export async function listCuts(db) {
 
 export async function listCategories(db) {
   const { results } = await db.prepare(
-    `SELECT c.id, c.name_ar, c.name_en, c.visible, c.sort_order,
+    `SELECT c.id, c.name_ar, c.name_en, c.visible, c.sort_order, c.image_id,
             (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.deleted_at IS NULL) AS usage_count
      FROM categories c WHERE c.deleted_at IS NULL ORDER BY c.sort_order`
   ).all();
@@ -481,9 +484,128 @@ export async function consumePrivateLinkView(db, token) {
 
 export async function exportTable(db, table) {
   const allowed = ['leads','products','variants','restaurants','contacts',
-                   'lead_events','categories','cuts','audit_log','private_links'];
+                   'lead_events','categories','cuts','audit_log','private_links','images'];
   if (!allowed.includes(table)) throw new Error('table not exportable');
 
   const { results } = await db.prepare(`SELECT * FROM ${table} ORDER BY created_at DESC LIMIT 5000`).all();
   return results;
+}
+
+// ---- images -------------------------------------------------
+// R2-backed image library. An image can exist with NO product
+// pointing to it (unlinked). Products link to images via image_id.
+
+export async function createImage(db, { actor, filename, r2Key, type, altAr, width, height }) {
+  const id = makeId('img');
+  const now = nowIso();
+  await db.prepare(
+    `INSERT INTO images (id, filename, r2_key, type, alt_ar, width, height, visible, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`
+  ).bind(id, filename, r2Key, type, altAr || null, width || null, height || null, now, now).run();
+  await audit(db, { actor, table: 'images', recordId: id, action: 'create',
+    diff: { filename, r2Key, type } });
+  return { id, r2Key };
+}
+
+export async function listImages(db, { type } = {}) {
+  const params = [];
+  let sql = `SELECT id, filename, r2_key, type, alt_ar, width, height, visible, created_at
+             FROM images WHERE deleted_at IS NULL`;
+  if (type) { sql += ` AND type = ?`; params.push(type); }
+  sql += ` ORDER BY created_at DESC`;
+  const { results } = await db.prepare(sql).bind(...params).all();
+  return results;
+}
+
+export async function getImage(db, id) {
+  return await db.prepare(
+    `SELECT * FROM images WHERE id = ? AND deleted_at IS NULL`
+  ).bind(id).first();
+}
+
+export async function getImageByR2Key(db, r2Key) {
+  return await db.prepare(
+    `SELECT * FROM images WHERE r2_key = ? AND deleted_at IS NULL`
+  ).bind(r2Key).first();
+}
+
+export async function updateImage(db, { actor, id, fields }) {
+  const now = nowIso();
+  const allowed = ['filename','type','alt_ar','width','height','visible'];
+  const sets = [];
+  const vals = [];
+  for (const k of allowed) {
+    if (k in fields) { sets.push(`${k} = ?`); vals.push(bind(fields[k])); }
+  }
+  if (!sets.length) return;
+  sets.push(`updated_at = ?`);
+  vals.push(now, id);
+  await db.prepare(`UPDATE images SET ${sets.join(', ')} WHERE id = ? AND deleted_at IS NULL`)
+    .bind(...vals).run();
+  await audit(db, { actor, table: 'images', recordId: id, action: 'update', diff: fields });
+}
+
+export async function hideImage(db, { actor, id }) {
+  const now = nowIso();
+  await db.prepare(
+    `UPDATE images SET visible = 0, updated_at = ? WHERE id = ? AND deleted_at IS NULL`
+  ).bind(now, id).run();
+  await audit(db, { actor, table: 'images', recordId: id, action: 'hide', diff: {} });
+}
+
+export async function softDeleteImage(db, { actor, id }) {
+  const now = nowIso();
+  await db.prepare(
+    `UPDATE images SET deleted_at = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL`
+  ).bind(now, now, id).run();
+  await audit(db, { actor, table: 'images', recordId: id, action: 'soft_delete', diff: {} });
+}
+
+// Link an image to a product (sets products.image_id).
+// Also clears the legacy products.image path so there's no ambiguity.
+export async function linkImageToProduct(db, { actor, imageId, productId }) {
+  const now = nowIso();
+  await db.prepare(
+    `UPDATE products SET image_id = ?, image = NULL, updated_at = ?
+     WHERE id = ? AND deleted_at IS NULL`
+  ).bind(imageId, now, productId).run();
+  await audit(db, { actor, table: 'products', recordId: productId, action: 'link_image',
+    diff: { imageId } });
+}
+
+// Link an image to a category (sets categories.image_id).
+export async function linkImageToCategory(db, { actor, imageId, categoryId }) {
+  const now = nowIso();
+  await db.prepare(
+    `UPDATE categories SET image_id = ?, updated_at = ?
+     WHERE id = ? AND deleted_at IS NULL`
+  ).bind(imageId, now, categoryId).run();
+  await audit(db, { actor, table: 'categories', recordId: categoryId, action: 'link_image',
+    diff: { imageId } });
+}
+
+// Unlink an image from whatever product/category points to it.
+// Sets image_id = NULL on the referencing row.
+export async function unlinkImage(db, { actor, imageId }) {
+  const now = nowIso();
+  await db.prepare(
+    `UPDATE products SET image_id = NULL, updated_at = ?
+     WHERE image_id = ? AND deleted_at IS NULL`
+  ).bind(now, imageId).run();
+  await db.prepare(
+    `UPDATE categories SET image_id = NULL, updated_at = ?
+     WHERE image_id = ? AND deleted_at IS NULL`
+  ).bind(now, imageId).run();
+  await audit(db, { actor, table: 'images', recordId: imageId, action: 'unlink', diff: {} });
+}
+
+// For the build script: fetch all images as a map { id -> row }.
+export async function getImagesMap(db) {
+  const { results } = await db.prepare(
+    `SELECT id, filename, r2_key, type, alt_ar, width, height, visible
+     FROM images WHERE deleted_at IS NULL`
+  ).all();
+  const out = {};
+  for (const r of results) out[r.id] = r;
+  return out;
 }

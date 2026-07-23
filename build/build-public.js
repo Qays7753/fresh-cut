@@ -61,8 +61,8 @@ async function loadFromD1() {
   }
 
   const [categories, products, settings] = await Promise.all([
-    sql(`SELECT id, name_ar, name_en FROM categories WHERE visible=1 AND deleted_at IS NULL ORDER BY sort_order`),
-    sql(`SELECT p.id, p.slug, p.name_ar, p.summary_ar, p.category_id, p.sort_order, p.image,
+    sql(`SELECT id, name_ar, name_en, image_id FROM categories WHERE visible=1 AND deleted_at IS NULL ORDER BY sort_order`),
+    sql(`SELECT p.id, p.slug, p.name_ar, p.summary_ar, p.category_id, p.sort_order, p.image, p.image_id,
                 v.id AS variant_id, v.cut_id, v.pack_size, v.shelf_life_days,
                 v.availability, v.availability_note_ar,
                 c.name_ar AS cut_name_ar
@@ -86,10 +86,10 @@ function generateFromSqlSeed() {
   // This mirrors migrations/0002_seed.sql exactly. If the seed
   // changes, regenerate build/seed.json with `npm run seed:json`.
   const categories = [
-    { id: 'cat_leafy',        name_ar: 'ورقيات',      name_en: 'Leafy Greens' },
-    { id: 'cat_onion_garlic', name_ar: 'بصل وثوم',    name_en: 'Onion & Garlic' },
-    { id: 'cat_roots',        name_ar: 'جذور',        name_en: 'Roots' },
-    { id: 'cat_mixes',        name_ar: 'خلطات جاهزة', name_en: 'Mixes' },
+    { id: 'cat_leafy',        name_ar: 'ورقيات',      name_en: 'Leafy Greens',   image_id: null },
+    { id: 'cat_onion_garlic', name_ar: 'بصل وثوم',    name_en: 'Onion & Garlic', image_id: null },
+    { id: 'cat_roots',        name_ar: 'جذور',        name_en: 'Roots',          image_id: null },
+    { id: 'cat_mixes',        name_ar: 'خلطات جاهزة', name_en: 'Mixes',          image_id: null },
   ];
   // Real catalog: 16 products, image per product (file = slug).
   const P = (catKey, slug, nameAr, cutAr, sort) => ({
@@ -100,6 +100,7 @@ function generateFromSqlSeed() {
     category_id: `cat_${catKey}`,
     sort_order: sort,
     image: `/img/${slug}.webp`,
+    image_id: null,
     variant_id: `var_${slug.replace(/-/g, '_')}`,
     cut_id: null,
     pack_size: '1kg',
@@ -220,17 +221,24 @@ async function build() {
   const cardHtml = categories.map(cat => {
     const items = productsByCat[cat.id] || [];
     if (!items.length) return '';
-    const cards = items.map(p => render(cardTemplate, {
-      SLUG: p.slug,
-      IMG_SRC: p.image || `/img/${p.slug}.webp`,
-      NAME_AR: p.name_ar,
-      SUMMARY_AR: p.summary_ar || '',
-      AVAILABILITY_CLASS: availabilityClass(p.availability),
-      AVAILABILITY_LABEL: availabilityLabel(p.availability, p.availability_note_ar),
-      CUT_NAME_AR: p.cut_name_ar || '—',
-      PACK_SIZE: p.pack_size || '1kg',
-      SHELF_LIFE: shelfLifeLabel(p.shelf_life_days),
-    })).join('\n');
+    const cards = items.map(p => {
+      // Image priority: image_id (R2-managed) > image (legacy static path) > fallback
+      const imgSrc = p.image_id ? `/api/images/${p.image_id}` : (p.image || `/img/${p.slug}.webp`);
+      return render(cardTemplate, {
+        SLUG: p.slug,
+        IMG_SRC: imgSrc,
+        IMG_WIDTH: 368,
+        IMG_HEIGHT: 245,
+        IMG_ALT: p.name_ar,
+        NAME_AR: p.name_ar,
+        SUMMARY_AR: p.summary_ar || '',
+        AVAILABILITY_CLASS: availabilityClass(p.availability),
+        AVAILABILITY_LABEL: availabilityLabel(p.availability, p.availability_note_ar),
+        CUT_NAME_AR: p.cut_name_ar || '—',
+        PACK_SIZE: p.pack_size || '1kg',
+        SHELF_LIFE: shelfLifeLabel(p.shelf_life_days),
+      });
+    }).join('\n');
     return `
       <div class="catalog__category-head">
         <span class="catalog__category-name">${cat.name_ar}</span>
@@ -248,13 +256,15 @@ async function build() {
     cat_mixes: 'cat-mixes',
   };
   const categoryGridHtml = categories.map(cat => {
-    const imgSlug = catImage[cat.id];
-    if (!imgSlug) return '';
+    // image_id (R2) takes priority; fall back to the static file map.
+    const imgSrc = cat.image_id
+      ? `/api/images/${cat.image_id}`
+      : `/img/${catImage[cat.id] || cat.id.replace('cat_', 'cat-')}.webp`;
     const count = (productsByCat[cat.id] || []).length;
     return `
         <a class="category-card" href="#catalog">
           <div class="category-card__media">
-            <img src="/img/${imgSlug}.webp" alt="فئة ${cat.name_ar} — خضار مقطّعة طازجة"
+            <img src="${imgSrc}" alt="فئة ${cat.name_ar} — خضار مقطّعة طازجة"
                  width="600" height="600" loading="lazy" decoding="async">
           </div>
           <div class="category-card__label">
@@ -562,10 +572,10 @@ async function build() {
 
   // Inline catalog as JSON for /api/catalog parity (and offline dev)
   const catalogJson = JSON.stringify({
-    categories: categories.map(c => ({ id: c.id, name_ar: c.name_ar, name_en: c.name_en })),
+    categories: categories.map(c => ({ id: c.id, name_ar: c.name_ar, name_en: c.name_en, image_id: c.image_id })),
     products: products.map(p => ({
       id: p.id, slug: p.slug, name_ar: p.name_ar, name_en: p.name_en,
-      summary_ar: p.summary_ar, category_id: p.category_id, image: p.image,
+      summary_ar: p.summary_ar, category_id: p.category_id, image: p.image, image_id: p.image_id,
       cut: p.cut_name_ar, pack_size: p.pack_size, availability: p.availability,
       availability_note_ar: p.availability_note_ar,
     })),

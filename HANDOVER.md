@@ -17,6 +17,7 @@
 | سرّ الإيميل (Resend) | ⏳ لم يُضبط بعد (الإيميل معطّل بأمان لحين ضبطه) |
 | Deploy hook (تحديث تلقائي) | ⏳ لم يُضبط بعد |
 | استبدال المحتوى النائب + الصور | ⏳ لم يبدأ |
+| **إدارة الصور عبر R2** | ⏳ الكود جاهز، يحتاج: إنشاء bucket + تفعيل binding + تشغيل migration (راجع §11) |
 
 ### المتبقّي (Do next)
 1. **redeploy the worker from latest `main`** لإزالة نقطة الفحص المؤقتة `/api/debug-write` (إن لم تُزَل بعد).
@@ -188,3 +189,87 @@ DELETE FROM audit_log WHERE actor='debug';
 - [ ] هو ينشئ **API token خاص به** (§6) — لا تشارك توكنك.
 - [ ] أضف إيميله في سياسة Access (§7) إن احتاج لوحة التحكم.
 - [ ] راجع سوياً "المتبقّي" في §1.
+
+---
+
+## 11. إدارة الصور عبر R2 (Image Management)
+
+ميزة إدارة الصور الكاملة من لوحة التحكم: رفع، تحرير، إخفاء، حذف منطقي، وربط صورة بمنتج أو فئة. الصور تُخزَّن في **Cloudflare R2**، والمصفوفات في جدول `images` في D1.
+
+### المعمارية
+
+```
+لوحة التحكم ─── POST /api/admin/images (multipart) ──▶ Worker
+                                                          ├── env.IMAGES.put(r2Key, bytes)  → R2 bucket
+                                                          └── INSERT INTO images (...)      → D1
+
+الموقع العام ─── <img src="/api/images/<id>"> ──▶ Worker
+                                                    ├── SELECT * FROM images WHERE id=?
+                                                    └── env.IMAGES.get(r2_key)         → R2 bytes
+                                                       (Cache-Control: public, max-age=31536000, immutable)
+```
+
+- الـWorker يخدم الصور على `/api/images/<id>` (مسار عام، **ليس** تحت `/api/admin/*` الذي يحجبه `public/_worker.js`).
+- الصور تُخزَّن بـ`r2_key` فريد (`img_<timestamp>_<random>.<ext>`) — لا يتغيّر أبداً، لذا يُخزَّن مؤقتاً للأبد (`immutable`).
+- الحذف **منطقي** فقط: `UPDATE images SET deleted_at = ...`. لا يُحذف أي صف من D1، ولا يُحذف أي كائن من R2.
+- كل عملية كتابة تمرّ عبر `audit()` في `queries.js`.
+
+### الإعداد لمرة واحدة (إلزامي لتفعيل الرفع)
+
+> الميزة تتحمّل غياب R2 بأمان: الـWorker يُنشَر دون مشاكل، والقائمة/التحرير/الربط تعمل (D1 فقط)، والرفع يُرجع خطأ واضحاً حتى يُفعَّل R2.
+
+1. **أنشئ R2 bucket:**
+   ```bash
+   cd worker
+   npx wrangler r2 bucket create alyaf-alshamal-images
+   ```
+
+2. **فعّل الـbinding في `worker/wrangler.toml`:** أزل التعليق `#` عن هذا المقطع:
+   ```toml
+   [[r2_buckets]]
+   binding       = "IMAGES"
+   bucket_name   = "alyaf-alshamal-images"
+   ```
+
+3. **أعد نشر الـWorker:**
+   ```bash
+   cd worker && npx wrangler deploy
+   ```
+   (أو ادفع على `main` — GitHub Actions سينشر تلقائياً.)
+
+4. **شغّل migration الصور:**
+   ```bash
+   cd worker
+   npx wrangler d1 execute alyaf-alshamal --remote --file=../migrations/0005_images.sql
+   ```
+   هذا ينشئ جدول `images`، ويضيف عمود `image_id` على `products` و`categories`، ويضيف مفاتيح إعدادات اختيارية (`hero_image_id`, `why_image_id`, `sample_image_id`).
+
+5. **(اختياري) أضف binding الـR2 على مشروعي Pages أيضاً** إذا أردت خدمة الصور مباشرة من R2 عبر Pages مستقبلاً. حالياً خدمة الصور تمرّ عبر الـWorker فقط، فلا حاجة لذلك الآن.
+
+### الاستخدام من لوحة التحكم
+
+- افتح `https://alyaf-alshamal-admin.pages.dev/#images` (أو اضغط على أيقونة + من أي صفحة صور).
+- **رفع صورة:** اضغط زر + → اختر ملف → اقرأ المعاينة والأبعاد تلقائياً → اختر النوع (صنف/فئة/رئيسية/شركة) → اكتب نصاً بديلاً عربياً → (اختياري) اربط بمنتج أو فئة → اضغط «رفع».
+- **تحرير:** اضغط «تحرير» على أي صورة → عدّل النوع/النص البديل/الأبعاد → احفظ.
+- **ربط:** اضغط «ربط» → اختر منتجاً أو فئة → اضغط «ربط». (الربط يضبط `image_id` على المنتج/الفئة، ويفرغ `image` القديم للمنتج.)
+- **إخفاء/إظهار:** يضبط `visible=0/1`. الصورة المخفية لا تظهر على الموقع العام (الـendpoint يُرجع 404).
+- **حذف (منطقي):** يضبط `deleted_at`. الصورة تختفي من اللوحة لكنها تبقى في D1 و R2 للاسترجاع.
+- **فك الربط:** اضغط «ربط» ثم اختر «— بدون ربط —» (أو من تحرير المنتج/الفئة مباشرة).
+
+### كيف تظهر الصور على الموقع العام
+
+- **المنتجات:** إذا ضُبط `image_id`، يصدر الـbuild وسم `<img src="/api/images/<id>">`. إذا لم يكن مضبوطاً، يقع fallback على `image` (المسار الثابت مثل `/img/foo.webp`).
+- **الفئات:** نفس المنطق — `image_id` أولاً، ثم fallback على ملف `cat-*.webp` الثابت.
+- **Hero / Why / Sample:** حالياً تقرأ من مسارات ثابتة (`/img/hero.webp` إلخ). يمكن ربطها بصور R2 مستقبلاً عبر مفاتيح الإعدادات `hero_image_id` / `why_image_id` / `sample_image_id` (الـmigration 0005 أضافها).
+
+### مبادئ التصميم (لا تُكسر)
+
+1. **الحذف منطقي دائماً:** `UPDATE ... SET deleted_at = ...`. لا `DELETE` في أي مكان.
+2. **audit log لكل عملية:** كل كتابة على `images` أو `products.image_id` أو `categories.image_id` تمرّ عبر `audit()`.
+3. **الصور غير المرتبطة تبقى في المكتبة:** لا تُضاف منتجات لمطابقة الصور. الصورة تُرفع أولاً، ثم تُربط لاحقاً (أو تبقى غير مرتبطة).
+4. **أبعاد صريحة:** الرفع يقرأ `width/height` من المتصفح ويخزّنهما في D1. الـbuild يصدر `width="..." height="..."` صريحين (يمنع CLS).
+5. **lazy loading:** كل صورة تحت الطيّة `loading="lazy"` (عدا hero إذا رُبطت لاحقاً).
+6. **Caching:** `Cache-Control: public, max-age=31536000, immutable` — لأن `r2_key` فريد لكل رفع.
+7. **degrade safely:** غياب `env.IMAGES` لا يكسر النشر؛ الرفع يُرجع `{error:'r2_not_configured'}`، والـendpoint العام يُرجع 404.
+8. **المسار العام:** خدمة الصور على `/api/images/*` (ليس `/api/admin/*` الذي يحجبه `public/_worker.js`).
+9. **لا حذف من R2:** حتى لو حُذفت الصورة منطقياً من D1، الكائن يبقى في R2 (للاسترجاع). حذف R2 فعلي يتطلب إجراءً يدوياً منفصلاً.

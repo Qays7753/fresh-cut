@@ -70,10 +70,11 @@
     if (page === 'categories') loadCategories();
     if (page === 'data')       loadDataView();
     if (page === 'links')      loadPrivateLinks();
+    if (page === 'images')     loadImages();
 
-    // Show FAB only on products page
+    // Show FAB on products (quick-add) and images (upload)
     var fab = document.querySelector('.admin-fab');
-    if (fab) fab.style.display = (page === 'products') ? 'inline-flex' : 'none';
+    if (fab) fab.style.display = (page === 'products' || page === 'images') ? 'inline-flex' : 'none';
   }
 
   // =========================================================
@@ -293,7 +294,10 @@
   // =========================================================
   function setupFab() {
     var fab = document.querySelector('.admin-fab');
-    if (fab) fab.addEventListener('click', openQuickAdd);
+    if (fab) fab.addEventListener('click', function () {
+      if (state.activePage === 'images') openImageUpload();
+      else openQuickAdd();
+    });
   }
 
   function openQuickAdd() {
@@ -488,7 +492,7 @@
     var el = document.querySelector('[data-data-view]');
     if (!el) return;
     var tables = ['leads','products','variants','restaurants','contacts',
-                  'lead_events','categories','cuts','audit_log','private_links'];
+                  'lead_events','categories','cuts','audit_log','private_links','images'];
     el.innerHTML = `
       <div class="data-toolbar">
         <select class="data-toolbar__select" id="dv-table">
@@ -560,6 +564,304 @@
       }).join('');
     });
   }
+
+  // =========================================================
+  // Images — grid, upload (with preview), edit, hide, delete, link
+  // =========================================================
+  function loadImages() {
+    api('images').then(function (images) {
+      var el = document.querySelector('[data-images]');
+      if (!el) return;
+      if (!images || !images.length) {
+        el.innerHTML = '<p class="admin-card">لا توجد صور في المكتبة. استخدم زر + لرفع صورة جديدة.</p>';
+        return;
+      }
+      el.innerHTML = '<div class="images-grid">' + images.map(function (img) {
+        var hidden = img.visible === 0 ? 'true' : 'false';
+        var typeLabel = imageTypeLabel(img.type);
+        var dims = (img.width && img.height) ? (img.width + '×' + img.height) : '—';
+        return `
+          <div class="image-card" data-hidden="${hidden}">
+            <div class="image-card__media">
+              <img src="/api/images/${esc(img.id)}" alt="${esc(img.alt_ar || img.filename)}" loading="lazy">
+            </div>
+            <div class="image-card__body">
+              <span class="image-card__type-badge">${typeLabel}</span>
+              <div class="image-card__filename" title="${esc(img.filename)}">${esc(img.filename)}</div>
+              <div class="image-card__meta">
+                <span>${dims}</span>
+                <span>${formatDate(img.created_at)}</span>
+              </div>
+              <div class="image-card__actions">
+                <button class="image-card__action image-card__action--primary"
+                        onclick="window.__editImage('${esc(img.id)}')">تحرير</button>
+                <button class="image-card__action"
+                        onclick="window.__linkImage('${esc(img.id)}')">ربط</button>
+                <button class="image-card__action"
+                        onclick="window.__toggleImageVisibility('${esc(img.id)}', ${img.visible})">
+                  ${img.visible === 0 ? 'إظهار' : 'إخفاء'}
+                </button>
+                <button class="image-card__action image-card__action--danger"
+                        onclick="window.__deleteImage('${esc(img.id)}')">حذف</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('') + '</div>';
+    }).catch(function () {
+      var el = document.querySelector('[data-images]');
+      if (el) el.innerHTML = '<p class="admin-card">تعذّر تحميل الصور.</p>';
+    });
+  }
+
+  function imageTypeLabel(t) {
+    return ({ hero: 'رئيسية', category: 'فئة', product: 'صنف', company: 'الشركة' })[t] || t;
+  }
+
+  // ---- Upload modal (with preview + dimensions read client-side) ----
+  function openImageUpload() {
+    var modal = document.querySelector('.admin-modal');
+    if (!modal) return;
+    modal.querySelector('[data-modal-title]').textContent = 'رفع صورة';
+    modal.querySelector('[data-modal-body]').innerHTML = `
+      <div class="upload-preview upload-preview--empty" id="up-preview"></div>
+      <div class="admin-modal__row">
+        <label class="settings-row__label" for="up-file">اختر ملف صورة (WebP مفضّل)</label>
+        <input class="settings-row__input" id="up-file" type="file" accept="image/*">
+      </div>
+      <div class="admin-modal__row">
+        <label class="settings-row__label" for="up-type">النوع</label>
+        <select class="settings-row__input" id="up-type">
+          <option value="product">صنف</option>
+          <option value="category">فئة</option>
+          <option value="hero">رئيسية</option>
+          <option value="company">الشركة</option>
+        </select>
+      </div>
+      <div class="admin-modal__row">
+        <label class="settings-row__label" for="up-alt">نص بديل (وصف عربي للصورة)</label>
+        <input class="settings-row__input" id="up-alt" type="text" autocomplete="off">
+      </div>
+      <div class="admin-modal__row">
+        <label class="settings-row__label" for="up-link">ربط بمنتج أو فئة (اختياري)</label>
+        <select class="settings-row__input" id="up-link">
+          <option value="">— بدون ربط —</option>
+        </select>
+      </div>
+      <button class="btn btn--primary" data-upload-save>رفع</button>
+    `;
+    modal.dataset.open = 'true';
+
+    // File input → preview + read dimensions
+    var fileInput = document.getElementById('up-file');
+    var preview = document.getElementById('up-preview');
+    var width = null, height = null;
+
+    fileInput.addEventListener('change', function () {
+      var file = fileInput.files[0];
+      if (!file) return;
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        width = img.naturalWidth;
+        height = img.naturalHeight;
+        preview.classList.remove('upload-preview--empty');
+        preview.innerHTML = '';
+        preview.appendChild(img.cloneNode());
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); toast('تعذّر قراءة الصورة.'); };
+      img.src = url;
+    });
+
+    // Populate the link dropdown with products (grouped by category)
+    Promise.all([
+      api('products').catch(function () { return []; }),
+      api('categories').catch(function () { return []; }),
+    ]).then(function (results) {
+      var products = results[0] || [];
+      var categories = results[1] || [];
+      var sel = document.getElementById('up-link');
+      var html = '<option value="">— بدون ربط —</option>';
+      if (categories.length) {
+        html += '<optgroup label="ربط بفئة">';
+        categories.forEach(function (c) {
+          html += `<option value="cat:${esc(c.id)}">${esc(c.name_ar)}</option>`;
+        });
+        html += '</optgroup>';
+      }
+      if (products.length) {
+        html += '<optgroup label="ربط بمنتج">';
+        products.forEach(function (p) {
+          html += `<option value="prd:${esc(p.id)}">${esc(p.name_ar)}</option>`;
+        });
+        html += '</optgroup>';
+      }
+      sel.innerHTML = html;
+    });
+
+    modal.querySelector('[data-upload-save]').addEventListener('click', function () {
+      var file = fileInput.files[0];
+      if (!file) { toast('اختر ملف صورة أولاً.'); return; }
+      var type = document.getElementById('up-type').value;
+      var alt = document.getElementById('up-alt').value.trim();
+      var linkVal = document.getElementById('up-link').value;
+
+      var fd = new FormData();
+      fd.append('file', file);
+      fd.append('type', type);
+      fd.append('alt_ar', alt);
+      if (width) fd.append('width', String(width));
+      if (height) fd.append('height', String(height));
+      if (linkVal.startsWith('prd:')) fd.append('product_id', linkVal.slice(4));
+      if (linkVal.startsWith('cat:')) fd.append('category_id', linkVal.slice(4));
+
+      // Upload is NOT JSON — bypass the api() helper's JSON assumption.
+      fetch(API + '/images', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res.ok) {
+            modal.dataset.open = 'false';
+            toast('رُفعت الصورة.');
+            loadImages();
+          } else if (res.error === 'r2_not_configured') {
+            toast('R2 غير مُهيّأ. راجع HANDOVER.md §11 لإنشاء الـbucket.');
+          } else {
+            toast('تعذّر الرفع: ' + (res.error || 'خطأ غير معروف'));
+          }
+        })
+        .catch(function () { toast('تعذّر الرفع — تحقق من الشبكة.'); });
+    });
+  }
+
+  // ---- Edit image metadata ----
+  window.__editImage = function (id) {
+    api('images/' + id).catch(function () { return null; }).then(function (img) {
+      if (!img) { toast('تعذّر تحميل بيانات الصورة.'); return; }
+      var modal = document.querySelector('.admin-modal');
+      modal.querySelector('[data-modal-title]').textContent = 'تحرير الصورة';
+      modal.querySelector('[data-modal-body]').innerHTML = `
+        <div class="upload-preview">
+          <img src="/api/images/${esc(img.id)}" alt="${esc(img.alt_ar || img.filename)}">
+        </div>
+        <div class="admin-modal__row">
+          <label class="settings-row__label" for="ed-type">النوع</label>
+          <select class="settings-row__input" id="ed-type">
+            <option value="product" ${img.type==='product'?'selected':''}>صنف</option>
+            <option value="category" ${img.type==='category'?'selected':''}>فئة</option>
+            <option value="hero" ${img.type==='hero'?'selected':''}>رئيسية</option>
+            <option value="company" ${img.type==='company'?'selected':''}>الشركة</option>
+          </select>
+        </div>
+        <div class="admin-modal__row">
+          <label class="settings-row__label" for="ed-alt">نص بديل</label>
+          <input class="settings-row__input" id="ed-alt" type="text" value="${esc(img.alt_ar || '')}">
+        </div>
+        <div class="admin-modal__row" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)">
+          <div>
+            <label class="settings-row__label" for="ed-w">العرض</label>
+            <input class="settings-row__input" id="ed-w" type="number" value="${img.width || ''}">
+          </div>
+          <div>
+            <label class="settings-row__label" for="ed-h">الارتفاع</label>
+            <input class="settings-row__input" id="ed-h" type="number" value="${img.height || ''}">
+          </div>
+        </div>
+        <button class="btn btn--primary" data-edit-save>حفظ</button>
+      `;
+      modal.dataset.open = 'true';
+      modal.querySelector('[data-edit-save]').addEventListener('click', function () {
+        var fields = {
+          type: document.getElementById('ed-type').value,
+          alt_ar: document.getElementById('ed-alt').value.trim(),
+        };
+        var w = parseInt(document.getElementById('ed-w').value, 10);
+        var h = parseInt(document.getElementById('ed-h').value, 10);
+        if (w) fields.width = w;
+        if (h) fields.height = h;
+        api('images/' + id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(fields),
+        }).then(function () {
+          modal.dataset.open = 'false';
+          toast('حُفظ التعديل.');
+          loadImages();
+        }).catch(function () { toast('تعذّر الحفظ — سيتزامن لاحقاً.'); });
+      });
+    });
+  };
+
+  // ---- Link image to a product or category ----
+  window.__linkImage = function (id) {
+    Promise.all([
+      api('products').catch(function () { return []; }),
+      api('categories').catch(function () { return []; }),
+    ]).then(function (results) {
+      var products = results[0] || [];
+      var categories = results[1] || [];
+      var modal = document.querySelector('.admin-modal');
+      modal.querySelector('[data-modal-title]').textContent = 'ربط الصورة';
+      var html = '<div class="admin-modal__row"><label class="settings-row__label" for="lk-target">اربط بـ</label><select class="settings-row__input" id="lk-target">';
+      html += '<option value="">— اختر —</option>';
+      if (categories.length) {
+        html += '<optgroup label="فئة">';
+        categories.forEach(function (c) { html += `<option value="cat:${esc(c.id)}">${esc(c.name_ar)}</option>`; });
+        html += '</optgroup>';
+      }
+      if (products.length) {
+        html += '<optgroup label="منتج">';
+        products.forEach(function (p) { html += `<option value="prd:${esc(p.id)}">${esc(p.name_ar)}</option>`; });
+        html += '</optgroup>';
+      }
+      html += '</select></div>';
+      html += '<button class="btn btn--primary" data-link-save>ربط</button>';
+      modal.querySelector('[data-modal-body]').innerHTML = html;
+      modal.dataset.open = 'true';
+      modal.querySelector('[data-link-save]').addEventListener('click', function () {
+        var val = document.getElementById('lk-target').value;
+        if (!val) { toast('اختر هدفاً.'); return; }
+        var body = {};
+        if (val.startsWith('prd:')) body.productId = val.slice(4);
+        if (val.startsWith('cat:')) body.categoryId = val.slice(4);
+        api('images/' + id + '/link', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        }).then(function () {
+          modal.dataset.open = 'false';
+          toast('رُبطت الصورة.');
+          loadImages();
+        }).catch(function () { toast('تعذّر الربط — سيتزامن لاحقاً.'); });
+      });
+    });
+  };
+
+  // ---- Toggle visibility (hide/show) ----
+  window.__toggleImageVisibility = function (id, currentlyVisible) {
+    if (currentlyVisible === 0) {
+      // Currently hidden → show by setting visible=1 via PUT
+      api('images/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visible: 1 }),
+      }).then(function () { toast('أُظهرت الصورة.'); loadImages(); })
+        .catch(function () { toast('تعذّر — سيتزامن لاحقاً.'); });
+    } else {
+      // Currently visible → hide via /hide
+      api('images/' + id + '/hide', { method: 'POST' })
+        .then(function () { toast('أُخفيت الصورة.'); loadImages(); })
+        .catch(function () { toast('تعذّر — سيتزامن لاحقاً.'); });
+    }
+  };
+
+  // ---- Soft-delete (with confirmation, no swipe-to-delete per §7) ----
+  window.__deleteImage = function (id) {
+    if (!confirm('حذف هذه الصورة؟ (حذف منطقي — يمكن استرجاعها من قاعدة البيانات لاحقاً)')) return;
+    api('images/' + id + '/delete', { method: 'POST' })
+      .then(function () { toast('حُذفت الصورة (حذف منطقي).'); loadImages(); })
+      .catch(function () { toast('تعذّر — سيتزامن لاحقاً.'); });
+  };
 
   // =========================================================
   // Global search (products, leads, restaurants together)

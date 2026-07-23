@@ -9,6 +9,7 @@ import {
   getCatalogForPublic, getSettings, createLead, nextLeadRefSeq,
   formatLeadRef, normalizeJoPhone, findRestaurantByNameArea,
   createRestaurant, createContact, computeLeadStatus,
+  getImage,
 } from './queries.js';
 import { sendLeadNotification } from './email.js';
 import { handleAdmin } from './handlers/admin.js';
@@ -74,6 +75,14 @@ export default {
     // ---------- public lead submit ----------
     if (path === '/api/leads' && method === 'POST') {
       return handleLeadSubmit(request, env, ctx);
+    }
+
+    // ---------- public image serving ----------
+    // /api/images/<id> — reads metadata from D1, bytes from R2.
+    // Cached forever (r2_key is unique per upload). Degrades to 404
+    // if R2 binding is absent or the object is missing.
+    if (path.startsWith('/api/images/') && method === 'GET') {
+      return handleImageServe(request, env, path);
     }
 
     // ---------- admin namespace ----------
@@ -225,4 +234,48 @@ function computeReplyBy() {
   const next10 = new Date(tomorrow10);
   next10.setUTCDate(tomorrow10.getUTCDate() + 1);
   return { label: 'قبل الساعة 10 صباحاً بعد غد', ts: next10.toISOString() };
+}
+
+// ---- public image serving -----------------------------------
+// /api/images/<id> — metadata from D1, bytes from R2.
+// Long-cacheable: r2_key is unique per upload, so the URL never
+// changes content. Degrades to 404 if R2 is not configured or the
+// object is gone.
+async function handleImageServe(request, env, path) {
+  const id = path.replace('/api/images/', '');
+  if (!id) return new Response('not_found', { status: 404 });
+
+  const img = await getImage(env.DB, id);
+  if (!img || !img.visible || img.deleted_at) {
+    return new Response('not_found', { status: 404 });
+  }
+
+  if (!env.IMAGES) {
+    // R2 not configured — can't serve bytes. Return 404 so the
+    // browser shows alt text instead of a broken image icon.
+    return new Response('r2_not_configured', { status: 404 });
+  }
+
+  const obj = await env.IMAGES.get(img.r2_key);
+  if (!obj) {
+    return new Response('object_missing', { status: 404 });
+  }
+
+  // Content-Type from the stored httpMetadata, fallback to image/webp.
+  const ext = (img.filename || '').split('.').pop().toLowerCase();
+  const ctByExt = {
+    webp: 'image/webp', avif: 'image/avif', png: 'image/png',
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', svg: 'image/svg+xml',
+  };
+  const contentType = (obj.httpMetadata && obj.httpMetadata.contentType)
+    || ctByExt[ext] || 'image/webp';
+
+  return new Response(obj.body, {
+    status: 200,
+    headers: {
+      'Content-Type': contentType,
+      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Access-Control-Allow-Origin': '*',
+    },
+  });
 }
