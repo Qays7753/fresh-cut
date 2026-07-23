@@ -1,67 +1,219 @@
 /* ============================================================
-   Alyaf Al-Shamal — Dashboard Styles
-   Mobile-first admin (spec §7). Same tokens as public site.
-   Bottom nav (not side), 48px touch targets, thumb-friendly.
+   Alyaf Al-Shamal — Dashboard Styles (radical redesign)
+   Mobile-first admin. Same tokens as public site (§1–§13).
+   Quiet, confident instrument — not a template.
    ============================================================ */
 
 @import url('/css/tokens.css');
 
-/* ---- Layout shell ---- */
+/* ============================================================
+   1. Shell
+   ============================================================ */
 .admin-body {
   margin: 0;
-  background: color-mix(in srgb, var(--ink) 3%, var(--white));
+  background: var(--white);
   min-block-size: 100dvh;
   padding-block-end: calc(var(--bar-h) + env(safe-area-inset-bottom));
+  color: var(--ink);
+  /* Subtle ink-tinted ground — calmer than pure white, never gray */
+  background: color-mix(in srgb, var(--ink) 2.5%, var(--white));
 }
-.admin-body[data-bar="true"] { padding-block-end: calc(var(--bar-h) + env(safe-area-inset-bottom)); }
+.admin-body[data-bar="true"] {
+  padding-block-end: calc(var(--bar-h) + env(safe-area-inset-bottom));
+}
 
+/* ============================================================
+   2. Header — white, calm, with a single amber baseline rule
+   ============================================================ */
 .admin-header {
-  background: var(--green);
-  color: var(--white);
-  block-size: var(--header-h-mobile);
   position: sticky;
   top: 0;
   z-index: 40;
+  background: var(--white);
+  color: var(--ink);
+  block-size: var(--header-h-mobile);
+  border-block-end: 1px solid var(--hairline);
+  /* The single amber pulse of the header — a 3px baseline rule */
+  box-shadow: inset 0 -3px 0 var(--amber-brand);
 }
 .admin-header__inner {
   block-size: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--space-3);
   padding-inline: var(--gutter-mobile);
+  max-inline-size: var(--container-max);
+  margin-inline: auto;
 }
 .admin-header__brand {
-  font-size: var(--text-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
   font-weight: var(--weight-bold);
+  color: var(--ink);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.admin-header__brand::before {
+  content: "";
+  inline-size: 22px;
+  block-size: 22px;
+  flex: none;
+  background: var(--green);
+  border-radius: 6px;
+  /* A small wheat-stalk glyph (matching login brand) in white */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v18M5 7c3 2 4 4 7 4s4-2 7-4M5 12c3 2 4 4 7 4s4-2 7-4M5 17c3 2 4 4 7 4s4-2 7-4'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
 }
 .admin-header__search {
-  background: color-mix(in srgb, var(--white) 15%, transparent);
-  border: 0;
-  border-radius: var(--radius-field);
-  color: var(--white);
-  padding: var(--space-2) var(--space-4);
-  inline-size: 60%;
-  max-inline-size: 320px;
+  flex: 1;
+  min-inline-size: 0;
   block-size: 40px;
+  padding-inline: var(--space-4) var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-field);
+  background: var(--white);
+  color: var(--ink);
   font-size: var(--text-sm);
+  transition: border-color var(--dur-fast) var(--ease-signature);
 }
-.admin-header__search::placeholder { color: color-mix(in srgb, var(--white) 65%, transparent); }
+.admin-header__search::placeholder { color: var(--gray); }
+.admin-header__search:focus-visible {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent);
+}
+.admin-header__search::-webkit-search-cancel-button { -webkit-appearance: none; }
 
-/* ---- Main content ---- */
+/* Hide search on very small screens — products page has its own */
+@media (max-width: 560px) {
+  .admin-header__search { display: none; }
+}
+
+.admin-header__logout {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-btn);
+  block-size: 40px;
+  padding-inline: var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  min-block-size: var(--touch-min);
+  white-space: nowrap;
+  transition: border-color var(--dur-fast) var(--ease-signature),
+              background-color var(--dur-fast) var(--ease-signature);
+}
+.admin-header__logout:hover {
+  border-color: var(--amber-action);
+  color: var(--amber-action);
+}
+.admin-header__logout:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent);
+}
+.admin-header__logout svg { inline-size: 16px; block-size: 16px; flex: none; }
+.admin-header__logout-label { display: none; }
+@media (min-width: 768px) {
+  .admin-header__logout-label { display: inline; }
+}
+
+/* "More" affordance in the header — opens the full-screen section menu */
+.admin-header__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-btn);
+  block-size: 40px;
+  inline-size: 40px;
+  min-block-size: var(--touch-min);
+  min-inline-size: var(--touch-min);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-signature),
+              color var(--dur-fast) var(--ease-signature);
+}
+.admin-header__more:hover { border-color: var(--green); color: var(--green); }
+.admin-header__more:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent);
+}
+.admin-header__more svg { inline-size: 18px; block-size: 18px; }
+
+.admin-body[data-authed="false"] .admin-header,
+.admin-body[data-authed="false"] .admin-main,
+.admin-body[data-authed="false"] .admin-bottom-nav,
+.admin-body[data-authed="false"] .admin-fab { display: none !important; }
+.admin-body[data-authed="false"] .admin-header__logout { display: none; }
+
+@media (min-width: 1024px) {
+  .admin-header { block-size: var(--header-h-desktop); }
+  .admin-header__inner { padding-inline: var(--gutter-desktop); }
+  .admin-header__brand { font-size: var(--text-base); }
+}
+
+/* ============================================================
+   3. Main content + section chrome (eyebrow rule, title, intro)
+   ============================================================ */
 .admin-main {
-  padding-block: var(--space-5);
+  padding-block: var(--space-5) var(--space-7);
   padding-inline: var(--gutter-mobile);
   max-inline-size: 1100px;
   margin-inline: auto;
 }
+@media (min-width: 768px) {
+  .admin-main { padding-inline: var(--gutter-tablet); padding-block: var(--space-6) var(--space-7); }
+}
 @media (min-width: 1024px) {
-  .admin-main { padding-inline: var(--gutter-desktop); padding-block: var(--space-7); }
+  .admin-main { padding-inline: var(--gutter-desktop); padding-block: var(--space-7) var(--space-8); }
 }
 
 .admin-section { display: none; }
 .admin-section[data-active="true"] { display: block; }
 
-/* ---- Cards / blocks ---- */
+/* Page header — amber eyebrow rule (40×3), title, optional intro */
+.admin-section__header {
+  margin-block-end: var(--space-5);
+}
+.admin-section__eyebrow {
+  display: block;
+  inline-size: 40px;
+  block-size: 3px;
+  background: var(--amber-brand);
+  border-radius: var(--radius-pill);
+  margin-block-end: var(--space-3);
+}
+.admin-section__title {
+  font-size: var(--text-xl);
+  line-height: var(--leading-xl);
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+  letter-spacing: 0;
+  text-wrap: pretty;
+}
+@media (min-width: 1024px) {
+  .admin-section__title { font-size: var(--text-2xl); line-height: var(--leading-2xl); }
+}
+.admin-section__intro {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--gray);
+  max-inline-size: var(--measure);
+  margin-block-start: var(--space-3);
+}
+
+/* ============================================================
+   4. Cards & message states (admin-card = loading/empty/error)
+   ============================================================ */
 .admin-card {
   background: var(--white);
   border: 1px solid var(--hairline);
@@ -69,6 +221,9 @@
   box-shadow: var(--shadow-card);
   padding: var(--space-5);
   margin-block-end: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--gray);
+  text-align: center;
 }
 .admin-card__title {
   font-size: var(--text-base);
@@ -77,102 +232,274 @@
   margin-block-end: var(--space-4);
 }
 
-/* ---- Today page (§7) ---- */
-.today-task {
+/* State modifiers — added by a small inline observer script in index.html.
+   Keeps the JS-generated "جارٍ التحميل…" / "لا توجد…" / "تعذّر…" messages
+   feeling like deliberate states, not placeholders. */
+.admin-card--loading {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--space-4);
+  gap: var(--space-3);
+  padding: var(--space-7) var(--space-5);
+  color: var(--gray);
+}
+.admin-card--loading::before {
+  content: "";
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--hairline);
+  border-block-start-color: var(--green);
+  animation: admin-spin 0.9s var(--ease-signature) infinite;
+}
+.admin-card--empty,
+.admin-card--error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-7) var(--space-5);
+}
+.admin-card--empty::before,
+.admin-card--error::before {
+  content: "";
+  inline-size: 32px;
+  block-size: 32px;
+  flex: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 32px 32px;
+  opacity: 0.55;
+}
+.admin-card--empty::before {
+  /* Quiet empty-tray outline */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235C5C58' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='14' rx='2'/><path d='M3 10h18'/><path d='M8 14h8'/></svg>");
+}
+.admin-card--error::before {
+  /* Quiet warning triangle */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A85D1F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3 2 21h20L12 3z'/><path d='M12 9v6'/><circle cx='12' cy='18' r='0.75' fill='%23A85D1F'/></svg>");
+}
+.admin-card--error { color: var(--amber-action); }
+
+@keyframes admin-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-card--loading::before { animation: none; }
+}
+
+/* ============================================================
+   5. Today page — task cards
+   ============================================================ */
+.today-task {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-card);
   background: var(--white);
+  box-shadow: var(--shadow-card);
   margin-block-end: var(--space-3);
   min-block-size: var(--touch-min);
   text-decoration: none;
   color: var(--ink);
-  transition: border-color var(--dur-fast) var(--ease-signature);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--dur-fast) var(--ease-signature),
+              box-shadow var(--dur-base) var(--ease-signature),
+              transform var(--dur-fast) var(--ease-signature);
 }
-.today-task:hover { border-color: var(--amber-brand); }
+.today-task::before {
+  /* A quiet 3px green leading rule — the "instrument" feel */
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: 0;
+  inline-size: 3px;
+  background: var(--green);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-signature);
+}
+.today-task:hover {
+  border-color: color-mix(in srgb, var(--ink) 14%, var(--white));
+  box-shadow: var(--shadow-hover);
+}
+.today-task:hover::before { opacity: 1; }
+.today-task:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent),
+              var(--shadow-card);
+}
 .today-task__count {
   font-size: var(--text-2xl);
+  line-height: 1;
   font-weight: var(--weight-bold);
-  color: var(--amber-action);
+  color: var(--green);
   font-variant-numeric: tabular-nums;
+  min-inline-size: 44px;
+  text-align: center;
 }
 .today-task__label {
   font-size: var(--text-sm);
-  color: var(--gray);
-  flex: 1;
-  padding-inline: var(--space-4);
+  line-height: var(--leading-sm);
+  color: var(--ink);
+  font-weight: var(--weight-regular);
 }
-.today-task__arrow { color: var(--gray); }
+.today-task__arrow {
+  color: var(--gray);
+  font-size: var(--text-lg);
+  line-height: 1;
+  /* RTL: arrow points left (towards the start) — already correct with ← glyph */
+  transition: transform var(--dur-fast) var(--ease-signature), color var(--dur-fast) var(--ease-signature);
+}
+.today-task:hover .today-task__arrow {
+  color: var(--green);
+  transform: translateX(-3px);
+}
+@media (min-width: 1024px) {
+  [data-today] {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+  }
+  [data-today] .today-task {
+    margin-block-end: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    grid-auto-rows: 1fr;
+  }
+  [data-today] .today-task {
+    /* Override grid-template for desktop card layout */
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+  [data-today] .today-task__count { font-size: var(--text-3xl); }
+  [data-today] .today-task__arrow { align-self: flex-end; }
+}
 
-/* ---- Leads list (stacked cards on mobile) ---- */
+/* ============================================================
+   6. Leads (and restaurants, private-links reuse lead-card)
+   ============================================================ */
 .lead-card {
+  display: block;
   background: var(--white);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-card);
-  padding: var(--space-4);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4) var(--space-5);
   margin-block-end: var(--space-3);
-  display: block;
   text-decoration: none;
   color: var(--ink);
-  transition: border-color var(--dur-fast) var(--ease-signature);
+  position: relative;
+  transition: border-color var(--dur-fast) var(--ease-signature),
+              box-shadow var(--dur-base) var(--ease-signature),
+              transform var(--dur-fast) var(--ease-signature);
 }
-.lead-card:hover { border-color: var(--amber-brand); }
+.lead-card:hover {
+  border-color: color-mix(in srgb, var(--ink) 14%, var(--white));
+  box-shadow: var(--shadow-hover);
+}
+.lead-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent),
+              var(--shadow-card);
+}
 .lead-card[data-overdue="true"] {
-  border-color: var(--amber-action);
+  border-color: color-mix(in srgb, var(--amber-action) 35%, var(--white));
   background: color-mix(in srgb, var(--amber-brand) 4%, var(--white));
 }
+.lead-card[data-overdue="true"]::before {
+  /* Subtle amber leading rule on overdue cards */
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: var(--space-4);
+  inline-size: 3px;
+  background: var(--amber-action);
+  border-radius: var(--radius-pill);
+}
 .lead-card__ref {
+  display: inline-block;
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   color: var(--amber-action);
   font-weight: var(--weight-medium);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
+  background: color-mix(in srgb, var(--amber-brand) 10%, transparent);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  margin-block-end: var(--space-2);
 }
 .lead-card__name {
   font-size: var(--text-base);
+  line-height: var(--leading-base);
   font-weight: var(--weight-medium);
-  margin-block-start: var(--space-2);
+  color: var(--ink);
+  margin-block-start: var(--space-1);
 }
 .lead-card__meta {
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   color: var(--gray);
   margin-block-start: var(--space-2);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2) var(--space-4);
+  gap: var(--space-1) var(--space-4);
 }
+.lead-card__meta span { display: inline-flex; align-items: center; gap: var(--space-1); }
 .lead-card__status {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   font-weight: var(--weight-medium);
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--green) 10%, transparent);
   color: var(--green);
   margin-block-start: var(--space-3);
+  letter-spacing: 0;
+}
+.lead-card__status::before {
+  content: "";
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  flex: none;
 }
 
-/* ---- Products list (§7) ---- */
+/* ============================================================
+   7. Products toolbar + rows
+   ============================================================ */
 .products-toolbar {
   display: flex;
   gap: var(--space-3);
   margin-block-end: var(--space-4);
   flex-wrap: wrap;
+  align-items: center;
 }
 .products-toolbar__search {
   flex: 1;
-  min-inline-size: 200px;
+  min-inline-size: 0;
   block-size: var(--field-h);
   padding-inline: var(--space-4);
-  border: 1px solid var(--gray);
+  border: 1px solid var(--hairline);
   border-radius: var(--radius-field);
   background: var(--white);
   font-size: var(--text-sm);
+  color: var(--ink);
+  transition: border-color var(--dur-fast) var(--ease-signature);
+}
+.products-toolbar__search:focus-visible {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent);
 }
 .products-toolbar__bulk {
   display: none;
@@ -182,34 +509,60 @@
   border-radius: var(--radius-btn);
   block-size: var(--btn-h-primary);
   padding-inline: var(--space-4);
+  font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   cursor: pointer;
+  min-block-size: var(--touch-min);
+  transition: background-color var(--dur-fast) var(--ease-signature);
 }
+.products-toolbar__bulk:hover { background: color-mix(in srgb, var(--ink) 12%, var(--green)); }
 .products-toolbar[data-selected="true"] .products-toolbar__bulk { display: inline-flex; }
 
 .product-row {
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  gap: var(--space-3);
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-4);
   align-items: center;
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   background: var(--white);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-card);
-  margin-block-end: var(--space-2);
+  box-shadow: var(--shadow-card);
+  margin-block-end: var(--space-3);
   min-block-size: var(--touch-min);
+  transition: border-color var(--dur-fast) var(--ease-signature),
+              box-shadow var(--dur-base) var(--ease-signature);
+}
+.product-row:hover {
+  border-color: color-mix(in srgb, var(--ink) 14%, var(--white));
+  box-shadow: var(--shadow-hover);
 }
 .product-row__check {
-  inline-size: var(--icon-md);
-  block-size: var(--icon-md);
+  inline-size: 20px;
+  block-size: 20px;
+  accent-color: var(--green);
+  cursor: pointer;
+  /* Hit-area: 44px touch target */
+  position: relative;
+  display: inline-block;
+}
+.product-row__check::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
 }
 .product-row__name {
   font-size: var(--text-base);
+  line-height: var(--leading-base);
   font-weight: var(--weight-medium);
+  color: var(--ink);
 }
 .product-row__meta {
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   color: var(--gray);
+  margin-block-start: var(--space-1);
+  font-variant-numeric: tabular-nums;
 }
 .product-row__availability-toggle {
   background: transparent;
@@ -225,14 +578,53 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: background-color var(--dur-fast) var(--ease-signature);
+}
+.product-row__availability-toggle:hover {
+  background: color-mix(in srgb, var(--green) 6%, transparent);
 }
 .product-row__availability-toggle[data-state="out_today"] {
   background: var(--amber-action);
   border-color: var(--amber-action);
   color: var(--white);
 }
+.product-row__availability-toggle[data-state="out_today"]:hover {
+  background: color-mix(in srgb, var(--ink) 12%, var(--amber-action));
+}
 
-/* ---- Settings ---- */
+/* ============================================================
+   8. Settings
+   ============================================================ */
+.settings-group {
+  background: var(--white);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+  margin-block-end: var(--space-5);
+}
+.settings-group__title {
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+  margin-block-end: var(--space-4);
+  padding-block-end: var(--space-3);
+  border-block-end: 2px solid var(--green);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.settings-group__title::before {
+  /* Small amber dot — the single pulse on settings groups */
+  content: "";
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--amber-brand);
+  flex: none;
+}
+
 .settings-row {
   display: grid;
   grid-template-columns: 1fr;
@@ -240,17 +632,30 @@
   padding-block: var(--space-4);
   border-block-end: 1px solid var(--hairline);
 }
+.settings-row:last-of-type { border-block-end: 0; padding-block-end: 0; }
 @media (min-width: 768px) {
-  .settings-row { grid-template-columns: 280px 1fr; align-items: start; }
+  .settings-row { grid-template-columns: 280px 1fr; align-items: start; gap: var(--space-5); }
 }
 .settings-row__label {
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
   font-weight: var(--weight-medium);
   color: var(--ink);
+  display: block;
 }
 .settings-row__hint {
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   color: var(--gray);
+  margin-block-start: var(--space-1);
+}
+.settings-row__hint code {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+  color: var(--gray);
+  background: var(--img-placeholder);
+  padding: 0 var(--space-1);
+  border-radius: 4px;
 }
 .settings-row__input,
 .settings-row__textarea {
@@ -261,15 +666,33 @@
   border-radius: var(--radius-field);
   background: var(--white);
   font-size: var(--text-sm);
+  color: var(--ink);
+  transition: border-color var(--dur-fast) var(--ease-signature);
+}
+.settings-row__input:focus-visible,
+.settings-row__textarea:focus-visible {
+  outline: none;
+  border-color: var(--green);
+  border-block-size: 2px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 25%, transparent);
+}
+.settings-row__input[type="file"] {
+  padding-block: var(--space-2);
+  block-size: auto;
+  min-block-size: var(--field-h);
+  cursor: pointer;
 }
 .settings-row__textarea {
   block-size: auto;
-  min-block-size: 80px;
+  min-block-size: 96px;
   padding-block: var(--space-3);
   resize: vertical;
+  line-height: var(--leading-sm);
 }
 
-/* ---- Data view ---- */
+/* ============================================================
+   9. Data view (toolbar + table)
+   ============================================================ */
 .data-toolbar {
   display: flex;
   gap: var(--space-3);
@@ -284,29 +707,50 @@
   border-radius: var(--radius-field);
   background: var(--white);
   font-size: var(--text-sm);
+  color: var(--ink);
+  cursor: pointer;
+  min-inline-size: 200px;
+  transition: border-color var(--dur-fast) var(--ease-signature);
+}
+.data-toolbar__select:focus-visible {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 25%, transparent);
 }
 .data-table {
   inline-size: 100%;
   border-collapse: collapse;
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   background: var(--white);
   border-radius: var(--radius-card);
   overflow: hidden;
+  border: 1px solid var(--hairline);
+  font-variant-numeric: tabular-nums;
 }
 .data-table th,
 .data-table td {
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   text-align: start;
   border-block-end: 1px solid var(--hairline);
+  white-space: nowrap;
 }
+.data-table tr:last-child td { border-block-end: 0; }
 .data-table th {
   background: color-mix(in srgb, var(--green) 5%, var(--white));
   font-weight: var(--weight-medium);
   color: var(--ink);
+  font-size: var(--text-xs);
+  text-transform: none;
 }
-.data-table tr:hover td { background: color-mix(in srgb, var(--green) 3%, var(--white)); }
+.data-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--green) 3%, var(--white));
+}
+.data-table td { color: var(--ink); }
 
-/* ---- Bottom nav (§7) — thumb at the bottom ---- */
+/* ============================================================
+   10. Bottom nav (5 items: اليوم، الليدز، الأصناف، المزيد، الإعدادات)
+   ============================================================ */
 .admin-bottom-nav {
   position: fixed;
   inset-block-end: 0;
@@ -317,7 +761,7 @@
   border-block-start: 1px solid var(--hairline);
   box-shadow: var(--shadow-bar);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   z-index: 50;
 }
 .admin-bottom-nav__item {
@@ -331,15 +775,50 @@
   color: var(--gray);
   text-decoration: none;
   font-size: var(--text-xs);
+  line-height: 1;
+  font-weight: var(--weight-medium);
   cursor: pointer;
   min-block-size: var(--touch-min);
+  position: relative;
   transition: color var(--dur-fast) var(--ease-signature);
 }
 .admin-bottom-nav__item:hover { color: var(--ink); }
 .admin-bottom-nav__item[data-active="true"] { color: var(--green); }
-.admin-bottom-nav__item svg { inline-size: var(--icon-md); block-size: var(--icon-md); }
+.admin-bottom-nav__item[data-active="true"]::before {
+  /* 3px green top indicator — only on the active primary item */
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 30%;
+  block-size: 3px;
+  background: var(--green);
+  border-radius: var(--radius-pill);
+}
+.admin-bottom-nav__item svg {
+  inline-size: 22px;
+  block-size: 22px;
+  flex: none;
+}
+.admin-bottom-nav__item:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent);
+  border-radius: var(--radius-btn);
+}
+/* The "more" item is a <button> (no data-nav) — it gets a subtle dot to hint at secondary */
+.admin-bottom-nav__item--more[data-open="true"] { color: var(--green); }
+.admin-bottom-nav__item--more[data-open="true"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 30%;
+  block-size: 3px;
+  background: var(--green);
+  border-radius: var(--radius-pill);
+}
 
-/* ---- Floating add button (three-field quick add) ---- */
+/* ============================================================
+   11. FAB (primary add action — green, not amber)
+   ============================================================ */
 .admin-fab {
   position: fixed;
   inset-block-end: calc(var(--bar-h) + var(--space-4) + env(safe-area-inset-bottom));
@@ -347,7 +826,7 @@
   inline-size: 56px;
   block-size: 56px;
   border-radius: var(--radius-pill);
-  background: var(--amber-action);
+  background: var(--green);
   color: var(--white);
   border: 0;
   display: inline-flex;
@@ -356,19 +835,33 @@
   box-shadow: var(--shadow-float);
   cursor: pointer;
   z-index: 45;
-  transition: transform var(--dur-fast) var(--ease-signature);
+  transition: transform var(--dur-fast) var(--ease-signature),
+              background-color var(--dur-fast) var(--ease-signature);
 }
-.admin-fab:hover { transform: scale(1.05); }
-.admin-fab:active { transform: scale(0.95); }
+.admin-fab:hover {
+  background: color-mix(in srgb, var(--ink) 12%, var(--green));
+  transform: translateY(-2px);
+}
+.admin-fab:active { transform: translateY(0) scale(0.96); }
+.admin-fab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber-action) 45%, transparent),
+              var(--shadow-float);
+}
 
-/* ---- Modal ---- */
+/* ============================================================
+   12. Modal — full-height bottom sheet on mobile, centered on desktop
+   ============================================================ */
 .admin-modal {
   position: fixed;
   inset: 0;
-  background: rgba(20,20,20,0.4);
+  background: color-mix(in srgb, var(--ink) 45%, transparent);
   z-index: 100;
   display: none;
   align-items: flex-end;
+  justify-content: stretch;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 .admin-modal[data-open="true"] { display: flex; }
 .admin-modal__sheet {
@@ -377,78 +870,474 @@
   max-inline-size: 600px;
   margin-inline: auto;
   border-radius: var(--radius-card) var(--radius-card) 0 0;
-  padding: var(--space-5);
-  animation: sheet-up var(--dur-base) var(--ease-signature);
+  /* Full-height column: header / scrollable body / sticky footer */
+  display: flex;
+  flex-direction: column;
+  max-block-size: 100dvh;
+  box-shadow: var(--shadow-float);
+  animation: sheet-up var(--dur-slow) var(--ease-signature);
+  overflow: hidden;
 }
 @keyframes sheet-up {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
+.admin-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-block-end: 1px solid var(--hairline);
+  /* Sticky header inside the sheet */
+  position: sticky;
+  inset-block-start: 0;
+  background: var(--white);
+  z-index: 3;
+}
 .admin-modal__title {
   font-size: var(--text-lg);
+  line-height: var(--leading-lg);
   font-weight: var(--weight-bold);
-  margin-block-end: var(--space-4);
+  color: var(--ink);
+  letter-spacing: 0;
+  flex: 1;
+  text-wrap: pretty;
 }
-.admin-modal__row { margin-block-end: var(--space-4); }
+.admin-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 36px;
+  block-size: 36px;
+  min-block-size: var(--touch-min);
+  min-inline-size: var(--touch-min);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-btn);
+  color: var(--gray);
+  cursor: pointer;
+  position: relative;
+  transition: background-color var(--dur-fast) var(--ease-signature),
+              color var(--dur-fast) var(--ease-signature);
+}
+.admin-modal__close::before {
+  /* Extend hit area to 44px */
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+.admin-modal__close:hover { background: var(--img-placeholder); color: var(--ink); }
+.admin-modal__close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent);
+}
+.admin-modal__close svg { inline-size: 20px; block-size: 20px; }
 
-/* ---- Toast (offline notice etc.) ---- */
+/* The body becomes the scroll container + a flex column so the
+   sticky footer can be pushed to the bottom of the sheet when the
+   content is short (via margin-block-start: auto). */
+.admin-modal__body {
+  padding: var(--space-5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+}
+.admin-modal__body > * + * { margin-block-start: 0; }
+.admin-modal__row { margin-block-end: var(--space-4); }
+.admin-modal__row:last-child { margin-block-end: 0; }
+
+/* Sticky footer — the last child div containing buttons (save/cancel rows)
+   injected by dashboard.js sticks to the bottom of the sheet body.
+   `margin-block-start: auto` pushes it to the bottom when content is short;
+   `position: sticky` keeps it visible while the body scrolls.
+   Uses :has() (broadly supported since 2023). */
+.admin-modal__body > div:has(> [data-product-save]),
+.admin-modal__body > div:has(> [data-cut-save]),
+.admin-modal__body > div:has(> [data-cat-save]),
+.admin-modal__body > div:has(> [data-edit-save]),
+.admin-modal__body > div:has(> [data-link-save]),
+.admin-modal__body > div:has(> [data-upload-save]),
+.admin-modal__body > div:has(> [data-quick-add-save]) {
+  position: sticky;
+  inset-block-end: 0;
+  background: var(--white);
+  padding-block: var(--space-4) 0;
+  margin-block-start: auto !important;
+  border-block-start: 1px solid var(--hairline);
+  z-index: 2;
+  /* Override the inline gap that JS sets, keep alignment clean */
+  display: flex !important;
+  gap: var(--space-3) !important;
+}
+/* Batch upload + media picker footers (no save data-attr, but they have buttons
+   as the last child) */
+.admin-modal__body > div:has(> #bu-start),
+.admin-modal__body > .media-picker__actions {
+  position: sticky;
+  inset-block-end: 0;
+  background: var(--white);
+  padding-block: var(--space-4) 0;
+  margin-block-start: auto !important;
+  border-block-start: 1px solid var(--hairline);
+  z-index: 2;
+}
+
+/* Some modals (quick-add, image upload/edit/link) inject the save button as a
+   DIRECT child of the body (no wrapping div). Target those too — full-width
+   sticky footer for single-action sheets. */
+.admin-modal__body > [data-quick-add-save],
+.admin-modal__body > [data-upload-save],
+.admin-modal__body > [data-edit-save],
+.admin-modal__body > [data-link-save] {
+  position: sticky;
+  inset-block-end: 0;
+  margin-block-start: auto !important;
+  border-block-start: 1px solid var(--hairline);
+  z-index: 2;
+  display: flex !important;
+  inline-size: 100% !important;
+}
+
+/* Desktop: centered modal, not full-height sheet */
+@media (min-width: 768px) {
+  .admin-modal {
+    align-items: center;
+    padding: var(--space-5);
+  }
+  .admin-modal__sheet {
+    border-radius: var(--radius-card);
+    max-block-size: min(85dvh, 720px);
+    animation: modal-pop var(--dur-slow) var(--ease-signature);
+  }
+  @keyframes modal-pop {
+    from { transform: translateY(12px) scale(0.98); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+  }
+}
+
+/* ============================================================
+   13. Toast — ink, prominent
+   ============================================================ */
 .admin-toast {
   position: fixed;
-  inset-block-end: calc(var(--bar-h) + var(--space-7) + env(safe-area-inset-bottom));
+  inset-block-end: calc(var(--bar-h) + var(--space-5) + env(safe-area-inset-bottom));
   inset-inline: var(--space-5);
   background: var(--ink);
   color: var(--white);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-field);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-float);
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
   z-index: 90;
   opacity: 0;
   transform: translateY(8px);
   transition: opacity var(--dur-base) var(--ease-signature),
               transform var(--dur-base) var(--ease-signature);
   pointer-events: none;
+  max-inline-size: 480px;
+  margin-inline: auto;
 }
 .admin-toast[data-visible="true"] {
   opacity: 1;
   transform: translateY(0);
 }
-
-@media print {
-  .admin-header, .admin-bottom-nav, .admin-fab { display: none !important; }
+@media (min-width: 768px) {
+  .admin-toast { inset-inline: 0; }
 }
 
-/* ---- Images section (grid, upload, edit, link) ---- */
+/* ============================================================
+   14. Login overlay
+   ============================================================ */
+.admin-login {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: var(--white);
+}
+.admin-login::before {
+  /* A faint green corner accent — the brand mark without smearing */
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  inline-size: 240px;
+  block-size: 240px;
+  background: color-mix(in srgb, var(--green) 5%, transparent);
+  border-radius: var(--radius-pill);
+  pointer-events: none;
+}
+.admin-login[data-authed="true"] { display: none; }
+.admin-login__card {
+  position: relative;
+  inline-size: 100%;
+  max-inline-size: 420px;
+  padding: var(--space-7) var(--space-6);
+  box-shadow: var(--shadow-float);
+  text-align: center;
+  border: 1px solid var(--hairline);
+  /* Top amber accent rule — the single pulse */
+  box-shadow: var(--shadow-float), inset 0 3px 0 var(--amber-brand);
+}
+.admin-login__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--green);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  margin-block-end: var(--space-5);
+  letter-spacing: 0;
+}
+.admin-login__brand svg {
+  inline-size: var(--icon-xl);
+  block-size: var(--icon-xl);
+}
+.admin-login__title {
+  font-size: var(--text-xl);
+  line-height: var(--leading-xl);
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+  margin-block-end: var(--space-2);
+  letter-spacing: 0;
+  text-wrap: pretty;
+}
+.admin-login__hint {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--gray);
+  margin-block-end: var(--space-6);
+}
+.admin-login__form { text-align: start; }
+.admin-login__submit {
+  inline-size: 100%;
+  block-size: var(--btn-h-primary);
+  margin-block-start: var(--space-4);
+}
+.admin-login__error {
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+  color: var(--amber-action);
+  background: color-mix(in srgb, var(--amber-brand) 8%, transparent);
+  border-radius: var(--radius-field);
+  padding: var(--space-2) var(--space-3);
+  margin-block-end: var(--space-2);
+}
+
+/* ============================================================
+   15. Buttons (§7.1)
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  line-height: 1;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  min-block-size: var(--touch-min);
+  padding-inline: var(--space-4);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background-color var(--dur-fast) var(--ease-signature),
+              border-color var(--dur-fast) var(--ease-signature),
+              color var(--dur-fast) var(--ease-signature),
+              transform var(--dur-fast) var(--ease-signature);
+}
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 40%, transparent);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn--primary {
+  background: var(--green);
+  color: var(--white);
+  block-size: var(--btn-h-primary);
+  padding-inline: var(--space-5);
+  font-weight: var(--weight-medium);
+}
+.btn--primary:hover {
+  background: color-mix(in srgb, var(--ink) 12%, var(--green));
+}
+.btn--primary:active { transform: translateY(1px); }
+
+.btn--secondary {
+  background: transparent;
+  border-color: var(--green);
+  color: var(--green);
+  block-size: var(--btn-h-secondary);
+}
+.btn--secondary:hover {
+  background: color-mix(in srgb, var(--green) 6%, transparent);
+}
+.btn--secondary:active { transform: translateY(1px); }
+
+.btn--text {
+  background: transparent;
+  border-color: transparent;
+  color: var(--amber-action);
+  block-size: var(--btn-h-secondary);
+  padding-inline: var(--space-3);
+}
+.btn--text:hover { text-decoration: underline; text-underline-offset: 4px; }
+.btn--text:active { transform: translateY(1px); }
+
+/* ============================================================
+   16. Form fields (.field / .field__label / .field__input / .field__select)
+   ============================================================ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.field__label {
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+  font-weight: var(--weight-medium);
+  color: var(--gray);
+  letter-spacing: 0;
+}
+.field__input,
+.field__select {
+  inline-size: 100%;
+  block-size: var(--field-h);
+  padding-inline: var(--space-4);
+  border: 1px solid var(--gray);
+  border-radius: var(--radius-field);
+  background: var(--white);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  transition: border-color var(--dur-fast) var(--ease-signature);
+}
+.field__input:focus-visible,
+.field__select:focus-visible {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 25%, transparent);
+}
+
+/* ============================================================
+   17. Row actions (edit / delete)
+   ============================================================ */
+.row-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.row-actions__btn {
+  background: transparent;
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  border-radius: var(--radius-btn);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  line-height: 1;
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  min-block-size: var(--touch-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--dur-fast) var(--ease-signature),
+              background-color var(--dur-fast) var(--ease-signature),
+              color var(--dur-fast) var(--ease-signature);
+}
+.row-actions__btn:hover {
+  border-color: color-mix(in srgb, var(--ink) 18%, var(--white));
+}
+.row-actions__btn--primary {
+  border-color: var(--green);
+  color: var(--green);
+}
+.row-actions__btn--primary:hover {
+  background: color-mix(in srgb, var(--green) 6%, transparent);
+}
+.row-actions__btn--danger {
+  border-color: var(--amber-action);
+  color: var(--amber-action);
+}
+.row-actions__btn--danger:hover {
+  background: color-mix(in srgb, var(--amber-action) 8%, transparent);
+}
+
+/* ============================================================
+   18. Images — toolbar, grid, image card
+   ============================================================ */
+.images-toolbar {
+  display: flex;
+  gap: var(--space-3);
+  margin-block-end: var(--space-4);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.images-toolbar__meta {
+  font-size: var(--text-xs);
+  color: var(--gray);
+  align-self: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .images-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-3);
 }
-@media (min-width: 768px) { .images-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); } }
-@media (min-width: 1024px) { .images-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 768px) {
+  .images-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+}
+@media (min-width: 1024px) {
+  .images-grid { grid-template-columns: repeat(4, 1fr); }
+}
 
 .image-card {
   background: var(--white);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: border-color var(--dur-fast) var(--ease-signature);
+  transition: border-color var(--dur-fast) var(--ease-signature),
+              box-shadow var(--dur-base) var(--ease-signature);
 }
-.image-card:hover { border-color: var(--amber-brand); }
-.image-card[data-hidden="true"] { opacity: 0.5; }
+.image-card:hover {
+  border-color: color-mix(in srgb, var(--ink) 14%, var(--white));
+  box-shadow: var(--shadow-hover);
+}
+.image-card[data-hidden="true"] { opacity: 0.55; }
 .image-card__media {
   aspect-ratio: 1 / 1;
   background: var(--img-placeholder);
   overflow: hidden;
+  border-block-end: 1px solid var(--hairline-soft);
 }
 .image-card__media img {
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
+  transition: transform var(--dur-base) var(--ease-signature);
 }
+.image-card:hover .image-card__media img { transform: scale(1.03); }
 .image-card__body {
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-4);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -456,6 +1345,7 @@
 }
 .image-card__filename {
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   font-weight: var(--weight-medium);
   color: var(--ink);
   overflow: hidden;
@@ -464,21 +1354,34 @@
 }
 .image-card__meta {
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   color: var(--gray);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-3);
+  font-variant-numeric: tabular-nums;
 }
 .image-card__type-badge {
   display: inline-flex;
   align-items: center;
+  gap: var(--space-1);
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   font-weight: var(--weight-medium);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--green) 10%, transparent);
   color: var(--green);
   align-self: flex-start;
+  letter-spacing: 0;
+}
+.image-card__type-badge::before {
+  content: "";
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  flex: none;
 }
 .image-card__actions {
   display: flex;
@@ -491,28 +1394,41 @@
   border: 1px solid var(--hairline);
   color: var(--ink);
   border-radius: var(--radius-btn);
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-2) var(--space-3);
   font-size: var(--text-xs);
+  line-height: 1;
   font-weight: var(--weight-medium);
   cursor: pointer;
   min-block-size: var(--touch-min);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 1;
   transition: border-color var(--dur-fast) var(--ease-signature),
-              background-color var(--dur-fast) var(--ease-signature);
+              background-color var(--dur-fast) var(--ease-signature),
+              color var(--dur-fast) var(--ease-signature);
 }
-.image-card__action:hover { border-color: var(--amber-brand); }
-.image-card__action--danger:hover {
-  border-color: var(--amber-action);
-  background: color-mix(in srgb, var(--amber-action) 8%, transparent);
+.image-card__action:hover {
+  border-color: color-mix(in srgb, var(--ink) 18%, var(--white));
 }
 .image-card__action--primary {
   border-color: var(--green);
   color: var(--green);
 }
+.image-card__action--primary:hover {
+  background: color-mix(in srgb, var(--green) 6%, transparent);
+}
+.image-card__action--danger {
+  border-color: var(--amber-action);
+  color: var(--amber-action);
+}
+.image-card__action--danger:hover {
+  background: color-mix(in srgb, var(--amber-action) 8%, transparent);
+}
 
-/* Upload form inside modal */
+/* ============================================================
+   19. Upload preview
+   ============================================================ */
 .upload-preview {
   inline-size: 100%;
   aspect-ratio: 3 / 2;
@@ -523,96 +1439,34 @@
   justify-content: center;
   color: var(--gray);
   font-size: var(--text-sm);
-  margin-block-end: var(--space-3);
+  margin-block-end: var(--space-4);
   overflow: hidden;
+  border: 1px dashed var(--hairline);
 }
 .upload-preview img {
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
 }
+.upload-preview--empty {
+  position: relative;
+  flex-direction: column;
+  gap: var(--space-3);
+}
 .upload-preview--empty::before {
+  content: "";
+  inline-size: 40px;
+  block-size: 40px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235C5C58' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><circle cx='8.5' cy='8.5' r='1.5'/><path d='m21 15-5-5L5 21'/></svg>") no-repeat center / 40px 40px;
+  opacity: 0.6;
+}
+.upload-preview--empty::after {
   content: "معاينة الصورة ستظهر هنا";
 }
 
-/* ---- Login overlay (replaces Cloudflare Access) ---- */
-.admin-login {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-5);
-  background: color-mix(in srgb, var(--ink) 3%, var(--white));
-}
-.admin-login[data-authed="true"] { display: none; }
-.admin-login__card {
-  inline-size: 100%;
-  max-inline-size: 420px;
-  padding: var(--space-7) var(--space-6);
-  box-shadow: var(--shadow-float);
-  text-align: center;
-}
-.admin-login__brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  color: var(--green);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-bold);
-  margin-block-end: var(--space-5);
-}
-.admin-login__brand svg { inline-size: var(--icon-xl); block-size: var(--icon-xl); }
-.admin-login__title {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-bold);
-  color: var(--ink);
-  margin-block-end: var(--space-2);
-}
-.admin-login__hint {
-  font-size: var(--text-sm);
-  color: var(--gray);
-  margin-block-end: var(--space-6);
-}
-.admin-login__form { text-align: start; }
-.admin-login__submit {
-  inline-size: 100%;
-  block-size: var(--btn-h-primary);
-  margin-block-start: var(--space-4);
-}
-.admin-login__error {
-  font-size: var(--text-xs);
-  color: var(--amber-action);
-  margin-block-end: var(--space-2);
-}
-/* Hide app chrome when not authed */
-.admin-body[data-authed="false"] .admin-header,
-.admin-body[data-authed="false"] .admin-main,
-.admin-body[data-authed="false"] .admin-bottom-nav,
-.admin-body[data-authed="false"] .admin-fab { display: none !important; }
-
-/* ---- Logout button in header ---- */
-.admin-header__logout {
-  background: transparent;
-  color: var(--white);
-  border: 1px solid color-mix(in srgb, var(--white) 40%, transparent);
-  border-radius: var(--radius-btn);
-  block-size: 40px;
-  padding-inline: var(--space-4);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  cursor: pointer;
-  min-block-size: var(--touch-min);
-  transition: background-color var(--dur-fast) var(--ease-signature);
-}
-.admin-header__logout:hover {
-  background: color-mix(in srgb, var(--white) 15%, transparent);
-}
-.admin-body[data-authed="false"] .admin-header__logout { display: none; }
-
-/* ---- Media Picker (modal overlay for choosing an existing image) ---- */
+/* ============================================================
+   20. Media picker
+   ============================================================ */
 .media-picker__filter {
   inline-size: 100%;
   block-size: var(--field-h);
@@ -621,7 +1475,14 @@
   border-radius: var(--radius-field);
   background: var(--white);
   font-size: var(--text-sm);
+  color: var(--ink);
   margin-block-end: var(--space-4);
+  cursor: pointer;
+}
+.media-picker__filter:focus-visible {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 25%, transparent);
 }
 .media-picker__grid {
   display: grid;
@@ -630,6 +1491,8 @@
   max-block-size: 50vh;
   overflow-y: auto;
   margin-block-end: var(--space-4);
+  padding: var(--space-1);
+  overscroll-behavior: contain;
 }
 @media (min-width: 768px) {
   .media-picker__grid { grid-template-columns: repeat(4, 1fr); }
@@ -642,9 +1505,12 @@
   overflow: hidden;
   cursor: pointer;
   background: var(--img-placeholder);
-  transition: border-color var(--dur-fast) var(--ease-signature);
+  transition: border-color var(--dur-fast) var(--ease-signature),
+              transform var(--dur-fast) var(--ease-signature);
 }
-.media-picker__item:hover { border-color: var(--amber-brand); }
+.media-picker__item:hover {
+  border-color: color-mix(in srgb, var(--ink) 18%, var(--white));
+}
 .media-picker__item[data-selected="true"] {
   border-color: var(--green);
   box-shadow: var(--shadow-card);
@@ -666,6 +1532,7 @@
   display: none;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--shadow-card);
 }
 .media-picker__item[data-selected="true"] .media-picker__check { display: flex; }
 .media-picker__empty {
@@ -679,16 +1546,20 @@
   display: flex;
   gap: var(--space-3);
   justify-content: flex-end;
+  margin-block-start: var(--space-2);
 }
 
-/* ---- Batch upload (progress + per-file rows) ---- */
+/* ============================================================
+   21. Batch upload
+   ============================================================ */
 .batch-upload__progress-track {
   inline-size: 100%;
   block-size: 8px;
-  background: var(--hairline);
+  background: var(--img-placeholder);
   border-radius: var(--radius-pill);
   overflow: hidden;
   margin-block-end: var(--space-3);
+  border: 1px solid var(--hairline);
 }
 .batch-upload__progress-fill {
   block-size: 100%;
@@ -699,8 +1570,10 @@
 }
 .batch-upload__summary {
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   color: var(--gray);
   margin-block-end: var(--space-3);
+  font-variant-numeric: tabular-nums;
 }
 .batch-upload__list {
   max-block-size: 40vh;
@@ -709,6 +1582,8 @@
   flex-direction: column;
   gap: var(--space-2);
   margin-block-end: var(--space-4);
+  overscroll-behavior: contain;
+  padding: 2px;
 }
 .batch-upload__row {
   display: grid;
@@ -729,27 +1604,35 @@
 }
 .batch-upload__info {
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: var(--weight-medium);
 }
 .batch-upload__info-sub {
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   color: var(--gray);
+  font-variant-numeric: tabular-nums;
 }
 .batch-upload__status {
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   font-weight: var(--weight-medium);
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+  letter-spacing: 0;
 }
-.batch-upload__status--ok { color: var(--green); }
-.batch-upload__status--err { color: var(--amber-action); }
+.batch-upload__status--ok    { color: var(--green); }
+.batch-upload__status--err   { color: var(--amber-action); }
 .batch-upload__status--pending { color: var(--gray); }
 
-/* ---- Product / variant editor ---- */
+/* ============================================================
+   22. Editor (variants, image pick, field groups)
+   ============================================================ */
 .editor__field-group {
   display: grid;
   grid-template-columns: 1fr;
@@ -763,6 +1646,7 @@
   align-items: center;
   gap: var(--space-3);
   margin-block-end: var(--space-4);
+  flex-wrap: wrap;
 }
 .editor__image-preview {
   inline-size: 96px;
@@ -771,6 +1655,13 @@
   object-fit: cover;
   background: var(--img-placeholder);
   border: 1px solid var(--hairline);
+  overflow: hidden;
+  flex: none;
+}
+.editor__image-preview img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
 }
 .editor__image-preview--empty {
   display: flex;
@@ -778,6 +1669,7 @@
   justify-content: center;
   color: var(--gray);
   font-size: var(--text-xs);
+  border-style: dashed;
 }
 .editor__variant-row {
   display: grid;
@@ -789,6 +1681,15 @@
   border: 1px solid var(--hairline);
   border-radius: var(--radius-field);
   margin-block-end: var(--space-3);
+}
+@media (max-width: 600px) {
+  .editor__variant-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .editor__variant-row > *:last-child {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
 }
 .editor__variant-row .field { gap: var(--space-1); }
 .editor__variant-row .field__label { font-size: var(--text-xs); }
@@ -815,6 +1716,10 @@
 .editor__variant-delete:hover {
   background: color-mix(in srgb, var(--amber-action) 8%, transparent);
 }
+.editor__variant-delete:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent);
+}
 .editor__add-variant {
   display: inline-flex;
   align-items: center;
@@ -830,54 +1735,184 @@
   cursor: pointer;
   min-block-size: var(--touch-min);
   margin-block-end: var(--space-4);
+  transition: background-color var(--dur-fast) var(--ease-signature);
+}
+.editor__add-variant:hover {
+  background: color-mix(in srgb, var(--green) 6%, transparent);
 }
 
-/* ---- Settings: grouped sections with Arabic labels ---- */
-.settings-group {
-  margin-block-end: var(--space-6);
+/* ============================================================
+   23. More-menu full-screen overlay
+   ============================================================ */
+.admin-more-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--white);
+  display: none;
+  flex-direction: column;
+  animation: more-in var(--dur-slow) var(--ease-signature);
 }
-.settings-group__title {
-  font-size: var(--text-base);
+.admin-more-menu[data-open="true"] { display: flex; }
+@keyframes more-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.admin-more-menu__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--gutter-mobile);
+  border-block-end: 1px solid var(--hairline);
+  block-size: var(--header-h-mobile);
+  flex: none;
+}
+.admin-more-menu__title {
+  font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   color: var(--ink);
-  margin-block-end: var(--space-2);
-  padding-block-end: var(--space-2);
-  border-block-end: 2px solid var(--green);
-}
-
-/* ---- Row action buttons (edit / delete) ---- */
-.row-actions {
   display: flex;
+  align-items: center;
   gap: var(--space-2);
 }
-.row-actions__btn {
-  background: transparent;
-  border: 1px solid var(--hairline);
-  color: var(--ink);
-  border-radius: var(--radius-btn);
-  padding: var(--space-1) var(--space-3);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  cursor: pointer;
-  min-block-size: var(--touch-min);
+.admin-more-menu__title::before {
+  content: "";
+  inline-size: 18px;
+  block-size: 18px;
+  background: var(--amber-brand);
+  border-radius: 4px;
+}
+.admin-more-menu__close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  inline-size: 40px;
+  block-size: 40px;
+  min-block-size: var(--touch-min);
+  min-inline-size: var(--touch-min);
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-btn);
+  color: var(--ink);
+  cursor: pointer;
   transition: border-color var(--dur-fast) var(--ease-signature);
 }
-.row-actions__btn:hover { border-color: var(--amber-brand); }
-.row-actions__btn--primary { border-color: var(--green); color: var(--green); }
-.row-actions__btn--danger:hover {
-  border-color: var(--amber-action);
-  color: var(--amber-action);
+.admin-more-menu__close:hover { border-color: var(--green); color: var(--green); }
+.admin-more-menu__close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent);
 }
+.admin-more-menu__close svg { inline-size: 18px; block-size: 18px; }
 
-/* ---- Batch upload button (images page toolbar) ---- */
-.images-toolbar {
+.admin-more-menu__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4) var(--gutter-mobile);
   display: flex;
-  gap: var(--space-3);
-  margin-block-end: var(--space-4);
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.admin-more-menu__item {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--white);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  text-decoration: none;
+  color: var(--ink);
+  min-block-size: var(--touch-min);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-signature),
+              background-color var(--dur-fast) var(--ease-signature);
+}
+.admin-more-menu__item:hover {
+  border-color: color-mix(in srgb, var(--ink) 14%, var(--white));
+  background: color-mix(in srgb, var(--green) 3%, var(--white));
+}
+.admin-more-menu__item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber-action) 35%, transparent);
+}
+.admin-more-menu__item[data-active="true"] {
+  border-color: var(--green);
+  background: color-mix(in srgb, var(--green) 6%, var(--white));
+}
+.admin-more-menu__item[data-active="true"] .admin-more-menu__icon {
+  background: var(--green);
+  color: var(--white);
+}
+.admin-more-menu__icon {
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: var(--radius-btn);
+  background: color-mix(in srgb, var(--green) 8%, transparent);
+  color: var(--green);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  transition: background-color var(--dur-fast) var(--ease-signature),
+              color var(--dur-fast) var(--ease-signature);
+}
+.admin-more-menu__icon svg { inline-size: 20px; block-size: 20px; }
+.admin-more-menu__hint {
+  font-size: var(--text-xs);
+  color: var(--gray);
+  font-weight: var(--weight-regular);
+}
+.admin-more-menu__arrow {
+  color: var(--gray);
+  font-size: var(--text-lg);
+  line-height: 1;
 }
 
+.admin-more-menu__footer {
+  flex: none;
+  padding: var(--space-4) var(--gutter-mobile) calc(var(--space-5) + env(safe-area-inset-bottom));
+  border-block-start: 1px solid var(--hairline);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+.admin-more-menu__brand {
+  font-size: var(--text-xs);
+  color: var(--gray);
+}
 
+/* ============================================================
+   24. Print
+   ============================================================ */
+@media print {
+  .admin-header, .admin-bottom-nav, .admin-fab, .admin-more-menu,
+  .admin-modal, .admin-toast { display: none !important; }
+  .admin-body { padding-block-end: 0; background: var(--white); }
+}
+
+/* ============================================================
+   25. Reduced motion — fully honored (tokens.css covers globals;
+   we add local overrides for sheet/more-menu spinners)
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .admin-modal__sheet,
+  .admin-more-menu { animation: none; }
+  .today-task__arrow,
+  .image-card__media img { transition: none; }
+}
+
+/* ============================================================
+   26. Desktop niceties — wider product list, refined spacing
+   ============================================================ */
+@media (min-width: 1024px) {
+  .product-row {
+    padding-block: var(--space-5);
+  }
+  .product-row__name { font-size: var(--text-lg); line-height: var(--leading-lg); }
+  .settings-group { padding: var(--space-6); }
+  .admin-card { padding: var(--space-6); }
+}

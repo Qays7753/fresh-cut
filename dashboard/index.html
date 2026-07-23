@@ -41,10 +41,23 @@
   <header class="admin-header">
     <div class="admin-header__inner">
       <span class="admin-header__brand">ألياف الشمال — اللوحة</span>
-      <div style="display:flex;align-items:center;gap:var(--space-3);flex:1;justify-content:flex-end">
-        <input type="search" class="admin-header__search" placeholder="بحث…" aria-label="بحث عام">
-        <button class="admin-header__logout" type="button" data-logout>خروج</button>
-      </div>
+      <input type="search" class="admin-header__search" placeholder="بحث…" aria-label="بحث عام">
+      <button class="admin-header__more" type="button" data-more-toggle aria-label="الأقسام">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </button>
+      <button class="admin-header__logout" type="button" data-logout aria-label="خروج">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span class="admin-header__logout-label">خروج</span>
+      </button>
     </div>
   </header>
 
@@ -52,7 +65,10 @@
 
     <!-- Today -->
     <section class="admin-section" data-page="today">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">اليوم</h1>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">اليوم</h1>
+      </header>
       <div data-today>
         <p class="admin-card">جارٍ التحميل…</p>
       </div>
@@ -60,7 +76,10 @@
 
     <!-- Leads -->
     <section class="admin-section" data-page="leads">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الليds</h1>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">الليدز</h1>
+      </header>
       <div data-leads>
         <p class="admin-card">جارٍ التحميل…</p>
       </div>
@@ -68,7 +87,10 @@
 
     <!-- Products -->
     <section class="admin-section" data-page="products">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الأصناف</h1>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">الأصناف</h1>
+      </header>
       <div class="products-toolbar" data-selected="false">
         <input type="search" class="products-toolbar__search" placeholder="بحث بالاسم…" aria-label="بحث الأصناف">
         <button class="products-toolbar__bulk">تعطيل المحدد</button>
@@ -80,10 +102,13 @@
 
     <!-- Settings -->
     <section class="admin-section" data-page="settings">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الإعدادات</h1>
-      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
-        كل نص يظهر على الموقع العام يأتي من هنا. التعديل يُطلق إعادة بناء الموقع تلقائياً.
-      </p>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">الإعدادات</h1>
+        <p class="admin-section__intro">
+          كل نص يظهر على الموقع العام يأتي من هنا. التعديل يُطلق إعادة بناء الموقع تلقائياً.
+        </p>
+      </header>
       <div data-settings>
         <p class="admin-card">جارٍ التحميل…</p>
       </div>
@@ -91,7 +116,10 @@
 
     <!-- Restaurants -->
     <section class="admin-section" data-page="restaurants">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">المطاعم</h1>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">المطاعم</h1>
+      </header>
       <div data-restaurants>
         <p class="admin-card">جارٍ التحميل…</p>
       </div>
@@ -99,10 +127,13 @@
 
     <!-- Cuts -->
     <section class="admin-section" data-page="cuts">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">أنواع القص</h1>
-      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
-        نوع قص مُستخدَم لا يُحذف — يُخفى فقط.
-      </p>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">أنواع القص</h1>
+        <p class="admin-section__intro">
+          نوع قص مُستخدَم لا يُحذف — يُخفى فقط.
+        </p>
+      </header>
       <div data-cuts>
         <p class="admin-card">جارٍ التحميل…</p>
       </div>
@@ -110,7 +141,10 @@
 
     <!-- Categories -->
     <section class="admin-section" data-page="categories">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الفئات</h1>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">الفئات</h1>
+      </header>
       <div data-categories>
         <p class="admin-card">جارٍ التحميل…</p>
       </div>
@@ -118,19 +152,25 @@
 
     <!-- Data view -->
     <section class="admin-section" data-page="data">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">عرض البيانات</h1>
-      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
-        نافذة على قاعدة البيانات. اقرأ، صفِّ، صدّر CSV — دون أي خدمة خارجية.
-      </p>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">عرض البيانات</h1>
+        <p class="admin-section__intro">
+          نافذة على قاعدة البيانات. اقرأ، صفِّ، صدّر CSV — دون أي خدمة خارجية.
+        </p>
+      </header>
       <div data-data-view></div>
     </section>
 
     <!-- Private links -->
     <section class="admin-section" data-page="links">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">روابط خاصة</h1>
-      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
-        روابط noindex لعرض خاص أو أسعار متفق عليها لعميل مؤكّد.
-      </p>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">روابط خاصة</h1>
+        <p class="admin-section__intro">
+          روابط noindex لعرض خاص أو أسعار متفق عليها لعميل مؤكّد.
+        </p>
+      </header>
       <div data-private-links>
         <p class="admin-card">جارٍ التحميل…</p>
       </div>
@@ -138,10 +178,13 @@
 
     <!-- Images -->
     <section class="admin-section" data-page="images">
-      <h1 style="font-size:var(--text-xl);font-weight:var(--weight-bold);margin-block-end:var(--space-5)">الصور</h1>
-      <p style="font-size:var(--text-sm);color:var(--gray);margin-block-end:var(--space-5)">
-        مكتبة الصور. ارفع، حرّر، أخفِ، احذف (حذف منطقي)، واربط صورة بمنتج أو فئة. الصور غير المرتبطة تبقى في المكتبة.
-      </p>
+      <header class="admin-section__header">
+        <span class="admin-section__eyebrow" aria-hidden="true"></span>
+        <h1 class="admin-section__title">الصور</h1>
+        <p class="admin-section__intro">
+          مكتبة الصور. ارفع، حرّر، أخفِ، احذف (حذف منطقي)، واربط صورة بمنتج أو فئة. الصور غير المرتبطة تبقى في المكتبة.
+        </p>
+      </header>
       <div data-images>
         <p class="admin-card">جارٍ التحميل…</p>
       </div>
@@ -157,18 +200,106 @@
     </svg>
   </button>
 
-  <!-- Modal sheet -->
+  <!-- Modal sheet — full-height on mobile, centered on desktop.
+       Header (title + close) / scrollable body / sticky save-cancel footer. -->
   <div class="admin-modal" data-open="false" role="dialog" aria-modal="true">
     <div class="admin-modal__sheet">
-      <h2 class="admin-modal__title" data-modal-title></h2>
-      <div data-modal-body></div>
+      <header class="admin-modal__header">
+        <h2 class="admin-modal__title" data-modal-title></h2>
+        <button class="admin-modal__close" type="button" data-modal-close aria-label="إغلاق">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </header>
+      <div class="admin-modal__body" data-modal-body></div>
     </div>
+  </div>
+
+  <!-- Full-screen "more" menu — all secondary sections reachable on mobile -->
+  <div class="admin-more-menu" data-open="false" role="dialog" aria-modal="true" aria-label="الأقسام الإضافية">
+    <header class="admin-more-menu__header">
+      <span class="admin-more-menu__title">الأقسام</span>
+      <button class="admin-more-menu__close" type="button" data-more-close aria-label="إغلاق">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </header>
+    <nav class="admin-more-menu__list" aria-label="أقسام إضافية">
+      <a class="admin-more-menu__item" data-nav="restaurants" href="#restaurants">
+        <span class="admin-more-menu__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18"/><path d="M9 21v-6h6v6"/><path d="M9 11h0M15 11h0"/></svg>
+        </span>
+        <span>
+          <span class="admin-more-menu__label">المطاعم</span>
+          <span class="admin-more-menu__hint">قاعدة العملاء والمطاعم</span>
+        </span>
+        <span class="admin-more-menu__arrow" aria-hidden="true">←</span>
+      </a>
+      <a class="admin-more-menu__item" data-nav="cuts" href="#cuts">
+        <span class="admin-more-menu__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        </span>
+        <span>
+          <span class="admin-more-menu__label">أنواع القص</span>
+          <span class="admin-more-menu__hint">المفروم، الشرائح، المكعبات…</span>
+        </span>
+        <span class="admin-more-menu__arrow" aria-hidden="true">←</span>
+      </a>
+      <a class="admin-more-menu__item" data-nav="categories" href="#categories">
+        <span class="admin-more-menu__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+        </span>
+        <span>
+          <span class="admin-more-menu__label">الفئات</span>
+          <span class="admin-more-menu__hint">ورقيات، جذور، بصل وثوم…</span>
+        </span>
+        <span class="admin-more-menu__arrow" aria-hidden="true">←</span>
+      </a>
+      <a class="admin-more-menu__item" data-nav="images" href="#images">
+        <span class="admin-more-menu__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </span>
+        <span>
+          <span class="admin-more-menu__label">الصور</span>
+          <span class="admin-more-menu__hint">مكتبة الصور ورفع دفعي</span>
+        </span>
+        <span class="admin-more-menu__arrow" aria-hidden="true">←</span>
+      </a>
+      <a class="admin-more-menu__item" data-nav="data" href="#data">
+        <span class="admin-more-menu__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+        </span>
+        <span>
+          <span class="admin-more-menu__label">عرض البيانات</span>
+          <span class="admin-more-menu__hint">تصفّح الجداول وصدّر CSV</span>
+        </span>
+        <span class="admin-more-menu__arrow" aria-hidden="true">←</span>
+      </a>
+      <a class="admin-more-menu__item" data-nav="links" href="#links">
+        <span class="admin-more-menu__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </span>
+        <span>
+          <span class="admin-more-menu__label">روابط خاصة</span>
+          <span class="admin-more-menu__hint">روابط noindex لعملاء مؤكّدين</span>
+        </span>
+        <span class="admin-more-menu__arrow" aria-hidden="true">←</span>
+      </a>
+    </nav>
+    <footer class="admin-more-menu__footer">
+      <span class="admin-more-menu__brand">ألياف الشمال · لوحة التحكم</span>
+      <button class="btn btn--text" type="button" data-more-close>إغلاق</button>
+    </footer>
   </div>
 
   <!-- Toast -->
   <div class="admin-toast" data-visible="false" role="status" aria-live="polite"></div>
 
-  <!-- Bottom nav — thumb at the bottom (§7) -->
+  <!-- Bottom nav — thumb at the bottom. 5 items: primary 4 + "more" overflow -->
   <nav class="admin-bottom-nav" aria-label="التنقّل الرئيسي">
     <a class="admin-bottom-nav__item" data-nav="today" href="#today" data-active="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -180,7 +311,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z"/>
       </svg>
-      <span>الليds</span>
+      <span>الليدز</span>
     </a>
     <a class="admin-bottom-nav__item" data-nav="products" href="#products">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -196,9 +327,18 @@
       </svg>
       <span>الإعدادات</span>
     </a>
+    <button class="admin-bottom-nav__item admin-bottom-nav__item--more" type="button" data-more-toggle data-open="false" aria-label="المزيد">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="5" cy="12" r="1.6"/>
+        <circle cx="12" cy="12" r="1.6"/>
+        <circle cx="19" cy="12" r="1.6"/>
+      </svg>
+      <span>المزيد</span>
+    </button>
   </nav>
 
-  <!-- Hidden menu items reachable via hash — restaurants, cuts, categories, data, links, images -->
+  <!-- Hidden menu items reachable via hash — restaurants, cuts, categories, data, links, images
+       (kept for hash-routing fallback; the visible more-menu above duplicates these) -->
   <nav aria-hidden="true" style="display:none">
     <a data-nav="restaurants" href="#restaurants"></a>
     <a data-nav="cuts" href="#cuts"></a>
@@ -209,5 +349,118 @@
   </nav>
 
   <script src="/js/dashboard.js" defer></script>
+  <script>
+    // =========================================================
+    // Dashboard UI enhancements — additive only, does NOT touch
+    // dashboard.js. Three responsibilities:
+    //   1. Classify JS-rendered .admin-card messages as
+    //      --loading / --empty / --error so CSS can style each.
+    //   2. Wire the full-screen "more" menu (open/close/escape).
+    //   3. Wire the modal close button (the JS only wires the
+    //      backdrop click + cancel buttons inside the body).
+    // =========================================================
+    (function () {
+      'use strict';
+
+      // ---- 1. State-aware styling for admin-card messages ----
+      var LOADING_RE = /جارٍ التحميل/;
+      var EMPTY_RE = /لا توجد|لا يوجد|فارغ|اختر جدولاً/;
+      var ERROR_RE = /تعذّر/;
+
+      function classifyCard(card) {
+        if (!card || !card.classList || !card.classList.contains('admin-card')) return;
+        var text = card.textContent || '';
+        card.classList.remove('admin-card--loading', 'admin-card--empty', 'admin-card--error');
+        if (LOADING_RE.test(text)) card.classList.add('admin-card--loading');
+        else if (ERROR_RE.test(text)) card.classList.add('admin-card--error');
+        else if (EMPTY_RE.test(text)) card.classList.add('admin-card--empty');
+      }
+
+      function scanCards(root) {
+        try { (root || document).querySelectorAll('.admin-card').forEach(classifyCard); }
+        catch (e) {}
+      }
+
+      // ---- 2. More-menu overlay ----
+      var moreMenu = document.querySelector('.admin-more-menu');
+      var moreToggleBtns = document.querySelectorAll('[data-more-toggle]');
+
+      function setMoreOpen(open) {
+        if (!moreMenu) return;
+        moreMenu.dataset.open = open ? 'true' : 'false';
+        moreToggleBtns.forEach(function (b) {
+          if (b.classList.contains('admin-bottom-nav__item')) {
+            b.dataset.open = open ? 'true' : 'false';
+          }
+        });
+      }
+      function openMoreMenu()  { setMoreOpen(true); }
+      function closeMoreMenu() { setMoreOpen(false); }
+      function toggleMoreMenu() {
+        if (moreMenu && moreMenu.dataset.open === 'true') closeMoreMenu();
+        else openMoreMenu();
+      }
+
+      moreToggleBtns.forEach(function (b) {
+        b.addEventListener('click', function (e) {
+          e.preventDefault();
+          toggleMoreMenu();
+        });
+      });
+
+      if (moreMenu) {
+        moreMenu.querySelectorAll('[data-more-close]').forEach(function (b) {
+          b.addEventListener('click', closeMoreMenu);
+        });
+        // Close after a nav item is tapped (dashboard.js's navigate handler runs too)
+        moreMenu.querySelectorAll('[data-nav]').forEach(function (a) {
+          a.addEventListener('click', function () { setTimeout(closeMoreMenu, 0); });
+        });
+      }
+
+      // Escape closes more-menu (and the modal, mirroring native dialog behaviour)
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMoreMenu();
+      });
+
+      // Close more-menu on navigation
+      window.addEventListener('hashchange', closeMoreMenu);
+
+      // ---- 3. Modal close button ----
+      document.querySelectorAll('[data-modal-close]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var modal = document.querySelector('.admin-modal');
+          if (modal) modal.dataset.open = 'false';
+        });
+      });
+
+      // ---- 4. Sync more-menu active item with current page ----
+      function syncMoreActive() {
+        var page = (location.hash || '#today').slice(1);
+        if (!moreMenu) return;
+        moreMenu.querySelectorAll('[data-nav]').forEach(function (a) {
+          a.dataset.active = (a.dataset.nav === page) ? 'true' : 'false';
+        });
+      }
+      window.addEventListener('hashchange', syncMoreActive);
+
+      // ---- 5. MutationObserver: classify admin-cards as they appear ----
+      scanCards(document);
+      if ('MutationObserver' in window) {
+        var observer = new MutationObserver(function (mutations) {
+          mutations.forEach(function (m) {
+            m.addedNodes.forEach(function (n) {
+              if (n.nodeType !== 1) return;
+              if (n.classList && n.classList.contains('admin-card')) classifyCard(n);
+              else scanCards(n);
+            });
+          });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
+
+      syncMoreActive();
+    })();
+  </script>
 </body>
 </html>
