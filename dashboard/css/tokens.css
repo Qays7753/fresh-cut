@@ -1,0 +1,189 @@
+/* ============================================================
+   Alyaf Al-Shamal — Design Tokens (single source of truth)
+   Visual reference §1, §2, §3, §4, §5.
+   No hex or px appears anywhere outside this file.
+   ============================================================ */
+
+:root {
+  /* ---- Color (§1) — six tokens only ---- */
+  --white:        #FFFFFF;
+  --green:        #0E3D24;
+  --amber-brand:  #C8742A;   /* large decorative shapes only */
+  --amber-action: #A85D1F;   /* text, links, small icons on white */
+  --ink:          #141414;
+  --gray:         #5C5C58;
+
+  /* ---- Shadows (§1) — two-layer, ink-colored, blur ≤ 40px ---- */
+  --shadow-card:  0 1px 2px rgba(20,20,20,0.04),
+                  0 4px 12px rgba(20,20,20,0.06);
+  --shadow-hover: 0 2px 4px rgba(20,20,20,0.05),
+                  0 12px 28px rgba(20,20,20,0.10);
+  --shadow-float: 0 4px 8px rgba(20,20,20,0.06),
+                  0 16px 40px rgba(20,20,20,0.14);
+  --shadow-bar:   0 -2px 8px rgba(20,20,20,0.06),
+                  0 -8px 24px rgba(20,20,20,0.08);
+
+  /* ---- Hairlines / image grounds (§1, §7.5) ---- */
+  --hairline:        rgba(20,20,20,0.06);
+  --hairline-soft:   rgba(20,20,20,0.05);
+  --img-placeholder: rgba(20,20,20,0.04);
+
+  /* ---- Reading measure (§11.1) ---- */
+  --measure: 640px;
+
+  /* ---- Spacing scale (§3) — 8px base, 4px half-step ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --space-desktop: 112px;
+  --space-sub: 80px;       /* §5.10 sub-section within one block */
+
+  /* ---- Type scale (§2) — 4/8px grid, line-height on 8px ---- */
+  --text-xs:  13px;   /* line-height 24px (1.85) */
+  --text-sm:  16px;   /* line-height 24px (1.5)  */
+  --text-base:20px;   /* line-height 32px (1.6)  */
+  --text-lg:  24px;   /* line-height 32px (1.33) */
+  --text-xl:  32px;   /* line-height 40px (1.25) */
+  --text-2xl: 40px;   /* line-height 48px (1.2)  */
+  --text-3xl: 48px;   /* line-height 56px (1.17) */
+  --text-4xl: 56px;   /* line-height 64px (1.14) */
+  --text-5xl: 64px;   /* line-height 72px (1.13) */
+
+  --leading-xs:   24px;
+  --leading-sm:   24px;
+  --leading-base: 32px;
+  --leading-lg:   32px;
+  --leading-xl:   40px;
+  --leading-2xl:  48px;
+  --leading-3xl:  56px;
+  --leading-4xl:  64px;
+  --leading-5xl:  72px;
+
+  /* ---- Font weights (§2) — three only ---- */
+  --weight-regular: 400;
+  --weight-medium:  600;
+  --weight-bold:    700;
+
+  /* ---- Motion (§4) — one signature curve, three durations ---- */
+  --ease-signature: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 180ms;
+  --dur-base: 220ms;
+  --dur-slow: 300ms;
+
+  /* ---- Radii (§5.5, §5.6, §5.7, §7.4) — deliberate variation ---- */
+  --radius-btn:   8px;
+  --radius-field: 8px;
+  --radius-card:  12px;
+  --radius-image: 12px;
+  --radius-pill:  999px;
+
+  /* ---- Breakpoints (§5.1) — referenced via media queries ---- */
+  --bp-tablet:  768px;
+  --bp-desktop: 1024px;
+  --bp-wide:    1440px;
+
+  /* ---- Container (§5.2) ---- */
+  --container-max: 1200px;
+  --gutter-mobile: 20px;
+  --gutter-tablet: 32px;
+  --gutter-desktop:40px;
+
+  /* ---- Component heights (§5.3, §5.6, §5.11) ---- */
+  --header-h-mobile:  64px;
+  --header-h-desktop: 80px;
+  --btn-h-primary:    48px;
+  --btn-h-secondary:  40px;
+  --field-h:          52px;
+  --fab-whatsapp:     56px;
+  --bar-h:            64px;
+
+  /* ---- Touch target minimum (§5.6, §9) ---- */
+  --touch-min: 44px;
+
+  /* ---- Card geometry (§5.5) ---- */
+  --card-w:        368px;
+  --card-img-w:    368px;
+  --card-img-h:    245px;
+
+  /* ---- Icons (§5.9) ---- */
+  --icon-sm: 20px;
+  --icon-md: 24px;
+  --icon-lg: 32px;
+  --icon-xl: 48px;
+  --icon-stroke: 1.75px;
+
+  /* ---- Typography family (§2) — self-hosted Arabic subset ---- */
+  --font-arabic: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+}
+
+/* ---- Font self-host (woff2 subset, weights 400/600/700 only) ---- */
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/IBM-Plex-Sans-Arabic-400.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF,
+                 U+FB50-FDFF, U+FE70-FEFF, U+0020-007E, U+00A0, U+060C;
+}
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/IBM-Plex-Sans-Arabic-600.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF,
+                 U+FB50-FDFF, U+FE70-FEFF, U+0020-007E, U+00A0, U+060C;
+}
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/IBM-Plex-Sans-Arabic-700.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF,
+                 U+FB50-FDFF, U+FE70-FEFF, U+0020-007E, U+00A0, U+060C;
+}
+
+/* ---- Reset that respects tokens ---- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-arabic);
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+  font-weight: var(--weight-regular);
+  color: var(--ink);
+  background: var(--white);
+  letter-spacing: 0;            /* Arabic: never negative tracking */
+  font-feature-settings: 'liga' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg, video { display: block; max-width: 100%; }
+img { height: auto; }
+button { font-family: inherit; }
+a { color: var(--amber-action); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: var(--weight-bold); text-wrap: pretty; }
+p { margin: 0; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+input, textarea, select, button { font: inherit; color: inherit; }
+
+/* ---- Reduced motion (§4) — fully honored ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
