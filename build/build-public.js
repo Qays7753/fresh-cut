@@ -62,7 +62,7 @@ async function loadFromD1() {
 
   const [categories, products, settings] = await Promise.all([
     sql(`SELECT id, name_ar, name_en FROM categories WHERE visible=1 AND deleted_at IS NULL ORDER BY sort_order`),
-    sql(`SELECT p.id, p.slug, p.name_ar, p.summary_ar, p.category_id, p.sort_order,
+    sql(`SELECT p.id, p.slug, p.name_ar, p.summary_ar, p.category_id, p.sort_order, p.image,
                 v.id AS variant_id, v.cut_id, v.pack_size, v.shelf_life_days,
                 v.availability, v.availability_note_ar,
                 c.name_ar AS cut_name_ar
@@ -91,33 +91,45 @@ function generateFromSqlSeed() {
     { id: 'cat_roots',        name_ar: 'جذور',        name_en: 'Roots' },
     { id: 'cat_mixes',        name_ar: 'خلطات جاهزة', name_en: 'Mixes' },
   ];
-  const cutNameById = {
-    cut_chopped: 'مفروم', cut_sliced: 'مقطع شرائح', cut_diced: 'مكعبات',
-    cut_grated: 'مبشور', cut_sticks: 'أصابع/باطوني', cut_julienne: 'جوليان',
-    cut_crushed: 'مهرّس', cut_peeled: 'مقشّر', cut_cut: 'مقطّع',
-  };
-  const products = [];
-  const cats = ['leafy', 'onion', 'roots', 'mixes'];
-  const cuts = ['cut_chopped', 'cut_chopped', 'cut_chopped', 'cut_diced',
-                'cut_sliced', 'cut_chopped', 'cut_sticks', 'cut_julienne',
-                'cut_diced', 'cut_chopped', 'cut_chopped', 'cut_chopped'];
-  let i = 0;
-  for (const c of cats) {
-    for (let n = 1; n <= 3; n++) {
-      const pid = `prd_${c}_${String(n).padStart(2, '0')}`;
-      const catId = `cat_${c === 'onion' ? 'onion_garlic' : c}`;
-      products.push({
-        id: pid, slug: `${c}-${String(n).padStart(2, '0')}`,
-        name_ar: '[[اسم الصنف]]', summary_ar: '[[وصف قصير للصنف — يستبدل من لوحة التحكم]]',
-        category_id: catId, sort_order: n * 10,
-        variant_id: `var_${c}_${String(n).padStart(2, '0')}`,
-        cut_id: cuts[i], pack_size: '1kg', shelf_life_days: null,
-        availability: 'available', availability_note_ar: null,
-        cut_name_ar: cutNameById[cuts[i]],
-      });
-      i++;
-    }
-  }
+  // Real catalog: 16 products, image per product (file = slug).
+  const P = (catKey, slug, nameAr, cutAr, sort) => ({
+    id: `prd_${slug.replace(/-/g, '_')}`,
+    slug,
+    name_ar: nameAr,
+    summary_ar: `${nameAr} طازج، مقطّع بعناية وجاهز للطهي مباشرة.`,
+    category_id: `cat_${catKey}`,
+    sort_order: sort,
+    image: `/img/${slug}.webp`,
+    variant_id: `var_${slug.replace(/-/g, '_')}`,
+    cut_id: null,
+    pack_size: '1kg',
+    shelf_life_days: null,
+    availability: 'available',
+    availability_note_ar: null,
+    cut_name_ar: cutAr,
+  });
+  const products = [
+    // بصل وثوم
+    P('onion_garlic', 'garlic-crushed',      'ثوم مهروس',        'مهروس',   10),
+    P('onion_garlic', 'garlic-peeled',       'ثوم مقشّر',        'مقشّر',   20),
+    P('onion_garlic', 'onion-red-chopped',   'بصل أحمر مفروم',   'مفروم',   30),
+    P('onion_garlic', 'onion-red-sliced',    'بصل أحمر شرائح',   'شرائح',   40),
+    P('onion_garlic', 'onion-white-chopped', 'بصل أبيض مفروم',   'مفروم',   50),
+    P('onion_garlic', 'onion-white-sliced',  'بصل أبيض شرائح',   'شرائح',   60),
+    // جذور
+    P('roots', 'carrot-sticks', 'جزر أصابع',   'أصابع',   10),
+    P('roots', 'carrot-grated', 'جزر مبشور',   'مبشور',   20),
+    P('roots', 'carrot-sliced', 'جزر شرائح',   'شرائح',   30),
+    P('roots', 'pumpkin-diced', 'قرع مكعّبات', 'مكعّبات', 40),
+    // ورقيات
+    P('leafy', 'parsley-chopped',        'بقدونس مفروم',     'مفروم', 10),
+    P('leafy', 'cabbage-red-shredded',   'ملفوف أحمر مبشور', 'مبشور', 20),
+    P('leafy', 'cabbage-white-shredded', 'ملفوف أبيض مبشور', 'مبشور', 30),
+    P('leafy', 'celery-sticks',          'كرفس أصابع',       'أصابع', 40),
+    // مخاليط
+    P('mixes', 'cauliflower-florets', 'زهرة مقسّمة',   'زهيرات', 10),
+    P('mixes', 'coconut-grated',      'جوز هند مبشور', 'مبشور',  20),
+  ];
   const settings = {
     brand_name: 'ألياف الشمال', brand_name_en: 'Alyaf Al-Shamal',
     page_title: 'ألياف الشمال — خضار مقطّعة جاهزة للمطاعم',
@@ -210,7 +222,7 @@ async function build() {
     if (!items.length) return '';
     const cards = items.map(p => render(cardTemplate, {
       SLUG: p.slug,
-      IMG_SRC: `/img/placeholder-${p.category_id}.svg`,
+      IMG_SRC: p.image || `/img/${p.slug}.webp`,
       NAME_AR: p.name_ar,
       SUMMARY_AR: p.summary_ar || '',
       AVAILABILITY_CLASS: availabilityClass(p.availability),
@@ -226,6 +238,30 @@ async function build() {
       </div>
       ${cards}
     `;
+  }).join('\n');
+
+  // Category grid (homepage) — one 1:1 image per category
+  const catImage = {
+    cat_leafy: 'cat-leafy-greens',
+    cat_onion_garlic: 'cat-onion-garlic',
+    cat_roots: 'cat-roots',
+    cat_mixes: 'cat-mixes',
+  };
+  const categoryGridHtml = categories.map(cat => {
+    const imgSlug = catImage[cat.id];
+    if (!imgSlug) return '';
+    const count = (productsByCat[cat.id] || []).length;
+    return `
+        <a class="category-card" href="#catalog">
+          <div class="category-card__media">
+            <img src="/img/${imgSlug}.webp" alt="فئة ${cat.name_ar} — خضار مقطّعة طازجة"
+                 width="600" height="600" loading="lazy" decoding="async">
+          </div>
+          <div class="category-card__label">
+            <span class="category-card__name">${cat.name_ar}</span>
+            <span class="category-card__count">${count} صنف</span>
+          </div>
+        </a>`;
   }).join('\n');
 
   // Hero, value strip, why, sample, contact, form
@@ -246,10 +282,10 @@ async function build() {
         </div>
         <div class="hero__visual">
           <img class="hero__image"
-               src="/img/hero-placeholder.svg"
-               alt="${S.brand_name || ''} — خضار مقطّعة طازجة"
+               src="/img/hero.webp"
+               alt="تشكيلة خضار طازجة مقطّعة وجاهزة للطهي من ألياف الشمال"
                width="1280" height="720"
-               fetchpriority="high" decoding="async">
+               fetchpriority="high" loading="eager" decoding="async">
         </div>
       </div>
     </section>
@@ -291,6 +327,19 @@ async function build() {
       </div>
     </section>
 
+    <!-- Categories grid — 1:1 image per category -->
+    <section class="section categories" id="categories">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-head__eyebrow">فئاتنا</span>
+          <h2 class="section-head__title">تصفّح حسب الفئة</h2>
+        </div>
+        <div class="category-grid">
+          ${categoryGridHtml}
+        </div>
+      </div>
+    </section>
+
     <!-- Catalog (§6.4) — all items exposed, no hidden tabs -->
     <section class="section" id="catalog">
       <div class="container">
@@ -310,9 +359,9 @@ async function build() {
       <div class="container">
         <div class="why__inner">
           <div class="why__media">
-            <img src="/img/why-placeholder.svg"
-                 alt="${S.why_heading || ''}"
-                 width="800" height="600"
+            <img src="/img/facility-interior.webp"
+                 alt="داخل منشأة ألياف الشمال — بيئة تحضير وتقطيع نظيفة"
+                 width="1280" height="720"
                  loading="lazy" decoding="async">
           </div>
           <div class="why__text">
@@ -354,7 +403,12 @@ async function build() {
             <p class="sample__body">${S.sample_body || ''}</p>
             <a href="#contact" class="btn btn--primary" data-order-sample>${S.hero_cta || 'اطلب عيّنة'}</a>
           </div>
-          <div></div>
+          <div class="sample__media">
+            <img src="/img/vacuum-pack.webp"
+                 alt="عبوة خضار مقطّعة مغلّفة بتفريغ الهواء للحفاظ على الطزاجة وسلسلة التبريد"
+                 width="1280" height="720"
+                 loading="lazy" decoding="async">
+          </div>
         </div>
       </div>
     </section>
@@ -511,7 +565,7 @@ async function build() {
     categories: categories.map(c => ({ id: c.id, name_ar: c.name_ar, name_en: c.name_en })),
     products: products.map(p => ({
       id: p.id, slug: p.slug, name_ar: p.name_ar, name_en: p.name_en,
-      summary_ar: p.summary_ar, category_id: p.category_id,
+      summary_ar: p.summary_ar, category_id: p.category_id, image: p.image,
       cut: p.cut_name_ar, pack_size: p.pack_size, availability: p.availability,
       availability_note_ar: p.availability_note_ar,
     })),

@@ -95,10 +95,10 @@
         </div>
         <div class="hero__visual">
           <img class="hero__image"
-               src="/img/hero-placeholder.svg"
-               alt="ألياف الشمال — خضار مقطّعة طازجة"
+               src="/img/hero.webp"
+               alt="تشكيلة خضار طازجة مقطّعة وجاهزة للطهي من ألياف الشمال"
                width="1280" height="720"
-               fetchpriority="high" decoding="async">
+               fetchpriority="high" loading="eager" decoding="async">
         </div>
       </div>
     </section>
@@ -140,6 +140,62 @@
       </div>
     </section>
 
+    <!-- Categories grid — 1:1 image per category -->
+    <section class="section categories" id="categories">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-head__eyebrow">فئاتنا</span>
+          <h2 class="section-head__title">تصفّح حسب الفئة</h2>
+        </div>
+        <div class="category-grid">
+          
+        <a class="category-card" href="#catalog">
+          <div class="category-card__media">
+            <img src="/img/cat-leafy-greens.webp" alt="فئة ورقيات — خضار مقطّعة طازجة"
+                 width="600" height="600" loading="lazy" decoding="async">
+          </div>
+          <div class="category-card__label">
+            <span class="category-card__name">ورقيات</span>
+            <span class="category-card__count">4 صنف</span>
+          </div>
+        </a>
+
+        <a class="category-card" href="#catalog">
+          <div class="category-card__media">
+            <img src="/img/cat-onion-garlic.webp" alt="فئة بصل وثوم — خضار مقطّعة طازجة"
+                 width="600" height="600" loading="lazy" decoding="async">
+          </div>
+          <div class="category-card__label">
+            <span class="category-card__name">بصل وثوم</span>
+            <span class="category-card__count">6 صنف</span>
+          </div>
+        </a>
+
+        <a class="category-card" href="#catalog">
+          <div class="category-card__media">
+            <img src="/img/cat-roots.webp" alt="فئة جذور — خضار مقطّعة طازجة"
+                 width="600" height="600" loading="lazy" decoding="async">
+          </div>
+          <div class="category-card__label">
+            <span class="category-card__name">جذور</span>
+            <span class="category-card__count">4 صنف</span>
+          </div>
+        </a>
+
+        <a class="category-card" href="#catalog">
+          <div class="category-card__media">
+            <img src="/img/cat-mixes.webp" alt="فئة خلطات جاهزة — خضار مقطّعة طازجة"
+                 width="600" height="600" loading="lazy" decoding="async">
+          </div>
+          <div class="category-card__label">
+            <span class="category-card__name">خلطات جاهزة</span>
+            <span class="category-card__count">2 صنف</span>
+          </div>
+        </a>
+        </div>
+      </div>
+    </section>
+
     <!-- Catalog (§6.4) — all items exposed, no hidden tabs -->
     <section class="section" id="catalog">
       <div class="container">
@@ -152,21 +208,21 @@
           
       <div class="catalog__category-head">
         <span class="catalog__category-name">ورقيات</span>
-        <span class="catalog__category-count">3 صنف</span>
+        <span class="catalog__category-count">4 صنف</span>
       </div>
       <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-leafy-01">
+<article class="product-card" id="product-parsley-chopped">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_leafy.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/parsley-chopped.webp"
+         alt="بقدونس مفروم"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">بقدونس مفروم</h3>
+    <p class="product-card__desc">بقدونس مفروم طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
       <span class="product-card__meta-item">القص: <b>مفروم</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
@@ -176,20 +232,20 @@
 </article>
 
 <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-leafy-02">
+<article class="product-card" id="product-cabbage-red-shredded">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_leafy.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/cabbage-red-shredded.webp"
+         alt="ملفوف أحمر مبشور"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">ملفوف أحمر مبشور</h3>
+    <p class="product-card__desc">ملفوف أحمر مبشور طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">القص: <b>مبشور</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -197,20 +253,41 @@
 </article>
 
 <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-leafy-03">
+<article class="product-card" id="product-cabbage-white-shredded">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_leafy.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/cabbage-white-shredded.webp"
+         alt="ملفوف أبيض مبشور"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">ملفوف أبيض مبشور</h3>
+    <p class="product-card__desc">ملفوف أبيض مبشور طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">القص: <b>مبشور</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-celery-sticks">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/celery-sticks.webp"
+         alt="كرفس أصابع"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">كرفس أصابع</h3>
+    <p class="product-card__desc">كرفس أصابع طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>أصابع</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -221,23 +298,23 @@
 
       <div class="catalog__category-head">
         <span class="catalog__category-name">بصل وثوم</span>
-        <span class="catalog__category-count">3 صنف</span>
+        <span class="catalog__category-count">6 صنف</span>
       </div>
       <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-onion-01">
+<article class="product-card" id="product-garlic-crushed">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_onion_garlic.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/garlic-crushed.webp"
+         alt="ثوم مهروس"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">ثوم مهروس</h3>
+    <p class="product-card__desc">ثوم مهروس طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>مكعبات</b></span>
+      <span class="product-card__meta-item">القص: <b>مهروس</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -245,20 +322,20 @@
 </article>
 
 <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-onion-02">
+<article class="product-card" id="product-garlic-peeled">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_onion_garlic.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/garlic-peeled.webp"
+         alt="ثوم مقشّر"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">ثوم مقشّر</h3>
+    <p class="product-card__desc">ثوم مقشّر طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>مقطع شرائح</b></span>
+      <span class="product-card__meta-item">القص: <b>مقشّر</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -266,20 +343,83 @@
 </article>
 
 <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-onion-03">
+<article class="product-card" id="product-onion-red-chopped">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_onion_garlic.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/onion-red-chopped.webp"
+         alt="بصل أحمر مفروم"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">بصل أحمر مفروم</h3>
+    <p class="product-card__desc">بصل أحمر مفروم طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
       <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-onion-red-sliced">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/onion-red-sliced.webp"
+         alt="بصل أحمر شرائح"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">بصل أحمر شرائح</h3>
+    <p class="product-card__desc">بصل أحمر شرائح طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>شرائح</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-onion-white-chopped">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/onion-white-chopped.webp"
+         alt="بصل أبيض مفروم"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">بصل أبيض مفروم</h3>
+    <p class="product-card__desc">بصل أبيض مفروم طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-onion-white-sliced">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/onion-white-sliced.webp"
+         alt="بصل أبيض شرائح"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">بصل أبيض شرائح</h3>
+    <p class="product-card__desc">بصل أبيض شرائح طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>شرائح</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -290,23 +430,23 @@
 
       <div class="catalog__category-head">
         <span class="catalog__category-name">جذور</span>
-        <span class="catalog__category-count">3 صنف</span>
+        <span class="catalog__category-count">4 صنف</span>
       </div>
       <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-roots-01">
+<article class="product-card" id="product-carrot-sticks">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_roots.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/carrot-sticks.webp"
+         alt="جزر أصابع"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">جزر أصابع</h3>
+    <p class="product-card__desc">جزر أصابع طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>أصابع/باطوني</b></span>
+      <span class="product-card__meta-item">القص: <b>أصابع</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -314,20 +454,20 @@
 </article>
 
 <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-roots-02">
+<article class="product-card" id="product-carrot-grated">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_roots.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/carrot-grated.webp"
+         alt="جزر مبشور"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">جزر مبشور</h3>
+    <p class="product-card__desc">جزر مبشور طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>جوليان</b></span>
+      <span class="product-card__meta-item">القص: <b>مبشور</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -335,20 +475,41 @@
 </article>
 
 <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-roots-03">
+<article class="product-card" id="product-carrot-sliced">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_roots.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/carrot-sliced.webp"
+         alt="جزر شرائح"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">جزر شرائح</h3>
+    <p class="product-card__desc">جزر شرائح طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>مكعبات</b></span>
+      <span class="product-card__meta-item">القص: <b>شرائح</b></span>
+      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
+      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
+    </div>
+  </div>
+</article>
+
+<!-- build/templates/product-row.html -->
+<article class="product-card" id="product-pumpkin-diced">
+  <div class="product-card__media">
+    <img class="product-card__image"
+         src="/img/pumpkin-diced.webp"
+         alt="قرع مكعّبات"
+         width="368" height="245"
+         loading="lazy" decoding="async">
+  </div>
+  <div class="product-card__body">
+    <span class="availability-badge availability-badge--available">متوفّر</span>
+    <h3 class="product-card__title">قرع مكعّبات</h3>
+    <p class="product-card__desc">قرع مكعّبات طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
+    <div class="product-card__meta">
+      <span class="product-card__meta-item">القص: <b>مكعّبات</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -359,23 +520,23 @@
 
       <div class="catalog__category-head">
         <span class="catalog__category-name">خلطات جاهزة</span>
-        <span class="catalog__category-count">3 صنف</span>
+        <span class="catalog__category-count">2 صنف</span>
       </div>
       <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-mixes-01">
+<article class="product-card" id="product-cauliflower-florets">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_mixes.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/cauliflower-florets.webp"
+         alt="زهرة مقسّمة"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">زهرة مقسّمة</h3>
+    <p class="product-card__desc">زهرة مقسّمة طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">القص: <b>زهيرات</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -383,41 +544,20 @@
 </article>
 
 <!-- build/templates/product-row.html -->
-<article class="product-card" id="product-mixes-02">
+<article class="product-card" id="product-coconut-grated">
   <div class="product-card__media">
     <img class="product-card__image"
-         src="/img/placeholder-cat_mixes.svg"
-         alt="[[اسم الصنف]]"
+         src="/img/coconut-grated.webp"
+         alt="جوز هند مبشور"
          width="368" height="245"
          loading="lazy" decoding="async">
   </div>
   <div class="product-card__body">
     <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
+    <h3 class="product-card__title">جوز هند مبشور</h3>
+    <p class="product-card__desc">جوز هند مبشور طازج، مقطّع بعناية وجاهز للطهي مباشرة.</p>
     <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
-      <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
-      <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
-    </div>
-  </div>
-</article>
-
-<!-- build/templates/product-row.html -->
-<article class="product-card" id="product-mixes-03">
-  <div class="product-card__media">
-    <img class="product-card__image"
-         src="/img/placeholder-cat_mixes.svg"
-         alt="[[اسم الصنف]]"
-         width="368" height="245"
-         loading="lazy" decoding="async">
-  </div>
-  <div class="product-card__body">
-    <span class="availability-badge availability-badge--available">متوفّر</span>
-    <h3 class="product-card__title">[[اسم الصنف]]</h3>
-    <p class="product-card__desc">[[وصف قصير للصنف — يستبدل من لوحة التحكم]]</p>
-    <div class="product-card__meta">
-      <span class="product-card__meta-item">القص: <b>مفروم</b></span>
+      <span class="product-card__meta-item">القص: <b>مبشور</b></span>
       <span class="product-card__meta-item">العبوة: <b>1kg</b></span>
       <span class="product-card__meta-item">الصلاحية: <b>—</b></span>
     </div>
@@ -434,9 +574,9 @@
       <div class="container">
         <div class="why__inner">
           <div class="why__media">
-            <img src="/img/why-placeholder.svg"
-                 alt="لماذا ألياف الشمال"
-                 width="800" height="600"
+            <img src="/img/facility-interior.webp"
+                 alt="داخل منشأة ألياف الشمال — بيئة تحضير وتقطيع نظيفة"
+                 width="1280" height="720"
                  loading="lazy" decoding="async">
           </div>
           <div class="why__text">
@@ -478,7 +618,12 @@
             <p class="sample__body">[[نص قسم العيّنة — يستبدل من الإعدادات]]</p>
             <a href="#contact" class="btn btn--primary" data-order-sample>اطلب عيّنة مجانية</a>
           </div>
-          <div></div>
+          <div class="sample__media">
+            <img src="/img/vacuum-pack.webp"
+                 alt="عبوة خضار مقطّعة مغلّفة بتفريغ الهواء للحفاظ على الطزاجة وسلسلة التبريد"
+                 width="1280" height="720"
+                 loading="lazy" decoding="async">
+          </div>
         </div>
       </div>
     </section>
@@ -614,7 +759,7 @@
       </div>
     </section>
   
-    <script>window.__ALYAF_SETTINGS__={"brand_name":"ألياف الشمال","brand_name_en":"Alyaf Al-Shamal","page_title":"ألياف الشمال — خضار مقطّعة جاهزة للمطاعم","meta_desc":"[[وصف مختصر للموقع لنتائج البحث — يستبدل من الإعدادات]]","whatsapp_number":"0777717753","notification_email":"businesses.access.25@gmail.com","order_cutoff":"قبل يومين من التوصيل","delivery_days":"[[أيام التوصيل — يستبدل من الإعدادات]]","delivery_areas":"[[مناطق التوصيل — يستبدل من الإعدادات]]","minimum_order":"[[الحد الأدنى للطلب — يستبدل من الإعدادات]]","replacement_policy":"[[سياسة الاستبدال — تستبدل من الإعدادات]]","payment_methods":"[[طرق الدفع — تستبدل من الإعدادات]]","hero_title":"خضار مقطّعة طازجة، جاهزة للطهي، تصلك يومياً","hero_support":"[[سطر داعم تحت العنوان — يستبدل من الإعدادات]]","hero_cta":"اطلب عيّنة مجانية","value_point_1":"توصيل يومي للمطاعم في عمّان","value_point_2":"تقطيع حسب الطلب — جاهز للطهي مباشرة","value_point_3":"[[نقطة قيمة ثالثة — تستبدل من الإعدادات]]","value_point_4":"[[نقطة قيمة رابعة — تستبدل من الإعدادات]]","catalog_heading":"الأصناف","catalog_sub":"كل الأصناف مكشوفة — لا تبويب يخفي شيئاً","why_heading":"لماذا ألياف الشمال","why_body":"[[نص قسم «لماذا نحن» — يستبدل من الإعدادات]]","sample_heading":"اطلب عيّنة مجانية","sample_body":"[[نص قسم العيّنة — يستبدل من الإعدادات]]","form_heading":"تواصل معنا","form_body":"املأ الطلب وسنردّ عليك على واتساب خلال ساعات","data_use_line":"نستخدم رقمك للتواصل معك بخصوص طلبك فقط","confirm_title":"وصلنا طلبك","confirm_body":"سنردّ عليك على واتساب قبل الساعة 10 صباحاً","confirm_cta":"افتح واتساب","wa_sample_template":"مرحباً، أرغب بطلب عيّنة. رقم المرجع: {{ref}}","wa_supply_template":"مرحباً، أرغب بطلب توريد. رقم المرجع: {{ref}}","footer_rights":"© ألياف الشمال — جميع الحقوق محفوظة"};window.__ALYAF_CATALOG__={"categories":[{"id":"cat_leafy","name_ar":"ورقيات","name_en":"Leafy Greens"},{"id":"cat_onion_garlic","name_ar":"بصل وثوم","name_en":"Onion & Garlic"},{"id":"cat_roots","name_ar":"جذور","name_en":"Roots"},{"id":"cat_mixes","name_ar":"خلطات جاهزة","name_en":"Mixes"}],"products":[{"id":"prd_leafy_01","slug":"leafy-01","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_leafy","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_leafy_02","slug":"leafy-02","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_leafy","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_leafy_03","slug":"leafy-03","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_leafy","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_01","slug":"onion-01","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_onion_garlic","cut":"مكعبات","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_02","slug":"onion-02","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_onion_garlic","cut":"مقطع شرائح","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_03","slug":"onion-03","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_onion_garlic","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_roots_01","slug":"roots-01","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_roots","cut":"أصابع/باطوني","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_roots_02","slug":"roots-02","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_roots","cut":"جوليان","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_roots_03","slug":"roots-03","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_roots","cut":"مكعبات","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_mixes_01","slug":"mixes-01","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_mixes","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_mixes_02","slug":"mixes-02","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_mixes","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_mixes_03","slug":"mixes-03","name_ar":"[[اسم الصنف]]","summary_ar":"[[وصف قصير للصنف — يستبدل من لوحة التحكم]]","category_id":"cat_mixes","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null}]};</script>
+    <script>window.__ALYAF_SETTINGS__={"brand_name":"ألياف الشمال","brand_name_en":"Alyaf Al-Shamal","page_title":"ألياف الشمال — خضار مقطّعة جاهزة للمطاعم","meta_desc":"[[وصف مختصر للموقع لنتائج البحث — يستبدل من الإعدادات]]","whatsapp_number":"0777717753","notification_email":"businesses.access.25@gmail.com","order_cutoff":"قبل يومين من التوصيل","delivery_days":"[[أيام التوصيل — يستبدل من الإعدادات]]","delivery_areas":"[[مناطق التوصيل — يستبدل من الإعدادات]]","minimum_order":"[[الحد الأدنى للطلب — يستبدل من الإعدادات]]","replacement_policy":"[[سياسة الاستبدال — تستبدل من الإعدادات]]","payment_methods":"[[طرق الدفع — تستبدل من الإعدادات]]","hero_title":"خضار مقطّعة طازجة، جاهزة للطهي، تصلك يومياً","hero_support":"[[سطر داعم تحت العنوان — يستبدل من الإعدادات]]","hero_cta":"اطلب عيّنة مجانية","value_point_1":"توصيل يومي للمطاعم في عمّان","value_point_2":"تقطيع حسب الطلب — جاهز للطهي مباشرة","value_point_3":"[[نقطة قيمة ثالثة — تستبدل من الإعدادات]]","value_point_4":"[[نقطة قيمة رابعة — تستبدل من الإعدادات]]","catalog_heading":"الأصناف","catalog_sub":"كل الأصناف مكشوفة — لا تبويب يخفي شيئاً","why_heading":"لماذا ألياف الشمال","why_body":"[[نص قسم «لماذا نحن» — يستبدل من الإعدادات]]","sample_heading":"اطلب عيّنة مجانية","sample_body":"[[نص قسم العيّنة — يستبدل من الإعدادات]]","form_heading":"تواصل معنا","form_body":"املأ الطلب وسنردّ عليك على واتساب خلال ساعات","data_use_line":"نستخدم رقمك للتواصل معك بخصوص طلبك فقط","confirm_title":"وصلنا طلبك","confirm_body":"سنردّ عليك على واتساب قبل الساعة 10 صباحاً","confirm_cta":"افتح واتساب","wa_sample_template":"مرحباً، أرغب بطلب عيّنة. رقم المرجع: {{ref}}","wa_supply_template":"مرحباً، أرغب بطلب توريد. رقم المرجع: {{ref}}","footer_rights":"© ألياف الشمال — جميع الحقوق محفوظة"};window.__ALYAF_CATALOG__={"categories":[{"id":"cat_leafy","name_ar":"ورقيات","name_en":"Leafy Greens"},{"id":"cat_onion_garlic","name_ar":"بصل وثوم","name_en":"Onion & Garlic"},{"id":"cat_roots","name_ar":"جذور","name_en":"Roots"},{"id":"cat_mixes","name_ar":"خلطات جاهزة","name_en":"Mixes"}],"products":[{"id":"prd_garlic_crushed","slug":"garlic-crushed","name_ar":"ثوم مهروس","summary_ar":"ثوم مهروس طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_onion_garlic","image":"/img/garlic-crushed.webp","cut":"مهروس","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_garlic_peeled","slug":"garlic-peeled","name_ar":"ثوم مقشّر","summary_ar":"ثوم مقشّر طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_onion_garlic","image":"/img/garlic-peeled.webp","cut":"مقشّر","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_red_chopped","slug":"onion-red-chopped","name_ar":"بصل أحمر مفروم","summary_ar":"بصل أحمر مفروم طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_onion_garlic","image":"/img/onion-red-chopped.webp","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_red_sliced","slug":"onion-red-sliced","name_ar":"بصل أحمر شرائح","summary_ar":"بصل أحمر شرائح طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_onion_garlic","image":"/img/onion-red-sliced.webp","cut":"شرائح","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_white_chopped","slug":"onion-white-chopped","name_ar":"بصل أبيض مفروم","summary_ar":"بصل أبيض مفروم طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_onion_garlic","image":"/img/onion-white-chopped.webp","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_onion_white_sliced","slug":"onion-white-sliced","name_ar":"بصل أبيض شرائح","summary_ar":"بصل أبيض شرائح طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_onion_garlic","image":"/img/onion-white-sliced.webp","cut":"شرائح","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_carrot_sticks","slug":"carrot-sticks","name_ar":"جزر أصابع","summary_ar":"جزر أصابع طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_roots","image":"/img/carrot-sticks.webp","cut":"أصابع","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_carrot_grated","slug":"carrot-grated","name_ar":"جزر مبشور","summary_ar":"جزر مبشور طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_roots","image":"/img/carrot-grated.webp","cut":"مبشور","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_carrot_sliced","slug":"carrot-sliced","name_ar":"جزر شرائح","summary_ar":"جزر شرائح طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_roots","image":"/img/carrot-sliced.webp","cut":"شرائح","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_pumpkin_diced","slug":"pumpkin-diced","name_ar":"قرع مكعّبات","summary_ar":"قرع مكعّبات طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_roots","image":"/img/pumpkin-diced.webp","cut":"مكعّبات","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_parsley_chopped","slug":"parsley-chopped","name_ar":"بقدونس مفروم","summary_ar":"بقدونس مفروم طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_leafy","image":"/img/parsley-chopped.webp","cut":"مفروم","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_cabbage_red_shredded","slug":"cabbage-red-shredded","name_ar":"ملفوف أحمر مبشور","summary_ar":"ملفوف أحمر مبشور طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_leafy","image":"/img/cabbage-red-shredded.webp","cut":"مبشور","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_cabbage_white_shredded","slug":"cabbage-white-shredded","name_ar":"ملفوف أبيض مبشور","summary_ar":"ملفوف أبيض مبشور طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_leafy","image":"/img/cabbage-white-shredded.webp","cut":"مبشور","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_celery_sticks","slug":"celery-sticks","name_ar":"كرفس أصابع","summary_ar":"كرفس أصابع طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_leafy","image":"/img/celery-sticks.webp","cut":"أصابع","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_cauliflower_florets","slug":"cauliflower-florets","name_ar":"زهرة مقسّمة","summary_ar":"زهرة مقسّمة طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_mixes","image":"/img/cauliflower-florets.webp","cut":"زهيرات","pack_size":"1kg","availability":"available","availability_note_ar":null},{"id":"prd_coconut_grated","slug":"coconut-grated","name_ar":"جوز هند مبشور","summary_ar":"جوز هند مبشور طازج، مقطّع بعناية وجاهز للطهي مباشرة.","category_id":"cat_mixes","image":"/img/coconut-grated.webp","cut":"مبشور","pack_size":"1kg","availability":"available","availability_note_ar":null}]};</script>
     </main>
 
   <!-- Footer (§6.8) -->

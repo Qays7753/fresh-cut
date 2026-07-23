@@ -342,6 +342,56 @@ body { overflow-x: clip; }    /* §9: clip not hidden (sticky survives) */
 @media (min-width: 1024px) {
   .catalog__grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
 }
+/* Category grid (homepage) — 1:1 image per category */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+@media (min-width: 768px) {
+  .category-grid { grid-template-columns: repeat(4, 1fr); gap: var(--space-5); }
+}
+.category-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--dur-base) var(--ease-signature),
+              box-shadow var(--dur-base) var(--ease-signature);
+}
+@media (hover: hover) and (min-width: 1024px) {
+  .category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+  .category-card:hover .category-card__media img { transform: scale(1.03); }
+}
+.category-card__media {
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: var(--img-placeholder);
+}
+.category-card__media img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-base) var(--ease-signature);
+}
+.category-card__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+}
+.category-card__name { font-weight: 600; color: var(--ink); }
+.category-card__count { font-size: var(--text-sm); color: var(--gray); }
+
 .catalog__category-head {
   grid-column: 1 / -1;
   display: flex;
@@ -538,6 +588,13 @@ body { overflow-x: clip; }    /* §9: clip not hidden (sticky survives) */
   }
 }
 .sample__text { max-inline-size: var(--measure); }
+.sample__media {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-image);
+  background: var(--img-placeholder);
+}
+.sample__media img { inline-size: 100%; block-size: 100%; object-fit: cover; }
 .sample__title {
   font-size: var(--text-2xl);
   line-height: var(--leading-2xl);
